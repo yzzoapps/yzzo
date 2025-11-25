@@ -2,10 +2,21 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { writeText, readText } from "@tauri-apps/plugin-clipboard-manager";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+
+  async function copySomething() {
+    await writeText("Hello from Tauri!");
+  }
+
+  async function pasteSomething() {
+    const text = await readText();
+    setGreetMsg(text);
+    console.log("Clipboard:", text);
+  }
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -29,6 +40,12 @@ function App() {
       </div>
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
+      <button type="submit" onClick={copySomething}>
+        Copy
+      </button>
+      <button type="submit" onClick={pasteSomething}>
+        Paste
+      </button>
       <form
         className="row"
         onSubmit={(e) => {
