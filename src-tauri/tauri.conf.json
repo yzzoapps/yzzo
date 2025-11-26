@@ -12,13 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "yzzo",
         "label": "main",
         "visible": false,
         "resizable": false,
-        "width": 360,
-        "height": 600,
-        "titleBarStyle": "Overlay"
+        "closable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "width": 320,
+        "height": 520,
+        "titleBarStyle": "Transparent",
+        "hiddenTitle": true
       }
     ],
     "security": {
