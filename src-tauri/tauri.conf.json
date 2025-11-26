@@ -13,7 +13,10 @@
     "windows": [
       {
         "title": "yzzo",
-        "width": 800,
+        "label": "main",
+        "visible": false,
+        "resizable": false,
+        "width": 360,
         "height": 600
       }
     ],
