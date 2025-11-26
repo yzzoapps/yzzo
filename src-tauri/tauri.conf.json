@@ -17,7 +17,8 @@
         "visible": false,
         "resizable": false,
         "width": 360,
-        "height": 600
+        "height": 600,
+        "titleBarStyle": "Overlay"
       }
     ],
     "security": {
