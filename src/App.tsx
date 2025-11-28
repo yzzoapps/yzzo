@@ -15,7 +15,7 @@ function App() {
   async function pasteSomething() {
     const text = await readText();
     setGreetMsg(text);
-    console.log("Clipboard:", text);
+    console.log("Clipboard: ", text);
   }
 
   async function greet() {
