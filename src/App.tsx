@@ -5,11 +5,27 @@ import "./App.css";
 import { writeText, readText } from "@tauri-apps/plugin-clipboard-manager";
 import { getItems, addItem } from "@yzzo/api/tauriApi";
 import { Item } from "@yzzo/models/Item";
+import { useClipboardEventWatcher } from "@yzzo/hooks/clipboardWatcher";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
   const [items, setItems] = useState<Item[]>([]);
+  const clipboardText = useClipboardEventWatcher();
+
+  useEffect(() => {
+    (async () => {
+      const existingItems = await getItems();
+      setItems(existingItems);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const updatedItems = await getItems();
+      setItems(updatedItems);
+    })();
+  }, [clipboardText]);
 
   async function copySomething() {
     await writeText("Hello from Tauri!");
@@ -20,18 +36,6 @@ function App() {
     setGreetMsg(text);
     addItem(text);
   }
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
-  useEffect(() => {
-    (async () => {
-      const existingItems = await getItems();
-      setItems(existingItems);
-    })();
-  }, [items]);
 
   return (
     <main className="container">
@@ -60,7 +64,6 @@ function App() {
         className="row"
         onSubmit={(e) => {
           e.preventDefault();
-          greet();
         }}
       >
         <input

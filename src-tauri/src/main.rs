@@ -9,6 +9,7 @@ use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_clipboard_manager;
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
+mod clipboard_watcher;
 mod commands;
 mod db;
 mod models;
@@ -33,10 +34,15 @@ fn main() {
             {
                 let handle = app.handle().clone();
 
-                tauri::async_runtime::spawn(async move {
-                    let db = setup_db(&handle).await;
-                    handle.manage(AppState { db });
+                tauri::async_runtime::spawn({
+                    let db_handle = handle.clone();
+                    async move {
+                        let db = setup_db(&db_handle).await;
+                        db_handle.manage(AppState { db });
+                    }
                 });
+
+                clipboard_watcher::start_clipboard_watcher(handle.clone());
 
                 // Autostart logic
                 let autostart_manager = app.autolaunch();
