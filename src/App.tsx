@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { writeText, readText } from "@tauri-apps/plugin-clipboard-manager";
+import { getItems, addItem } from "@yzzo/api/tauriApi";
+import { Item } from "@yzzo/models/Item";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [items, setItems] = useState<Item[]>([]);
 
   async function copySomething() {
     await writeText("Hello from Tauri!");
@@ -15,13 +18,20 @@ function App() {
   async function pasteSomething() {
     const text = await readText();
     setGreetMsg(text);
-    console.log("Clipboard: ", text);
+    addItem(text);
   }
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setGreetMsg(await invoke("greet", { name }));
   }
+
+  useEffect(() => {
+    (async () => {
+      const existingItems = await getItems();
+      setItems(existingItems);
+    })();
+  }, [items]);
 
   return (
     <main className="container">
@@ -61,6 +71,12 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <h2>Items:</h2>
+      <ul>
+        {items.map((item, idx) => (
+          <li key={idx}>{item.content}</li>
+        ))}
+      </ul>
     </main>
   );
 }
