@@ -1,13 +1,22 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::{
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Manager,
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_clipboard_manager;
 use tauri_plugin_positioner::{self, Position, WindowExt};
+
+mod commands;
+mod db;
+mod models;
+mod state;
+
+use commands::*;
+use db::setup_db;
+use state::AppState;
 
 fn main() {
     let mut app = tauri::Builder::default()
@@ -17,12 +26,20 @@ fn main() {
         ))
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![get_items, add_item])
         .setup(|app| {
             #[cfg(desktop)]
             {
-                // Get the autostart manager
+                let handle = app.handle().clone();
+
+                tauri::async_runtime::spawn(async move {
+                    let db = setup_db(&handle).await;
+                    handle.manage(AppState { db });
+                });
+
+                // Autostart logic
                 let autostart_manager = app.autolaunch();
-                // Enable autostart
                 let _ = autostart_manager.enable();
 
                 TrayIconBuilder::new()
@@ -51,6 +68,7 @@ fn main() {
                         }
                     })
                     .build(app)?;
+
                 Ok(())
             }
         })
