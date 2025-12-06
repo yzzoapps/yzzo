@@ -45,8 +45,10 @@ fn main() {
                 clipboard_watcher::start_clipboard_watcher(handle.clone());
 
                 // Autostart logic
-                let autostart_manager = app.autolaunch();
-                let _ = autostart_manager.enable();
+                if !cfg!(debug_assertions) {
+                    let autostart_manager = app.autolaunch();
+                    let _ = autostart_manager.enable();
+                }
 
                 TrayIconBuilder::new()
                     .icon(app.default_window_icon().unwrap().clone())
