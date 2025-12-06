@@ -1,4 +1,5 @@
 import { Outlet, Link } from "@tanstack/react-router";
+import "@yzzo/styles/App.css";
 
 const Root = () => {
   return (
