@@ -3,7 +3,7 @@ import "@yzzo/styles/App.css";
 
 const Root = () => {
   return (
-    <div>
+    <div className="font-ubuntu">
       <nav style={{ display: "flex", gap: 10 }}>
         <Link to="/">Home</Link>
         <Link to="/settings">Settings</Link>
