@@ -1,18 +1,9 @@
-import { Outlet, Link } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
 import "@yzzo/styles/App.css";
 
 const Root = () => {
   return (
-    <div className="font-ubuntu flex flex-col bg-[#F5F5F5] h-screen w-full">
-      <nav className="flex flex-row items-center justify-between h-16 px-4 py-10">
-        <Link to="/" className="h-10">
-          <img src="logo.svg" alt="Logo" className="h-full w-auto" />
-        </Link>
-        <div className="flex flex-row gap-4 items-start">
-          <Link to="/settings">S</Link>
-        </div>
-      </nav>
-
+    <div className="font-ubuntu flex flex-col bg-primary text-neutral-white h-screen w-full">
       <Outlet />
     </div>
   );

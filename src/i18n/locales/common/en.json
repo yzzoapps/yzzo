@@ -1,5 +1,7 @@
 {
   "settings": {
+    "title": "Settings",
+    "preferences": "Preferences",
     "hotkeys": "Hotkeys",
     "privacy": "Privacy",
     "about": "App info"
