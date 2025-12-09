@@ -5,4 +5,7 @@ use sqlx::FromRow;
 pub struct Item {
     id: u16,
     content: String,
+    created_at: String,
+    updated_at: String,
+    bumped_at: String,
 }

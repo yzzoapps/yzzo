@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { SettingsItem } from "@yzzo/components";
+import { PADDING_X, PADDING_Y } from "@yzzo/styles/constants";
 import { useTranslation } from "react-i18next";
 
 const Settings = () => {
@@ -6,8 +8,13 @@ const Settings = () => {
 
   return (
     <>
-      <div className="bg-primary h-12 flex items-center justify-center">
-        <h1 className="text-neutral-white font-medium">
+      <div
+        className={`bg-primary h-12 flex items-center justify-between ${PADDING_X} ${PADDING_Y}`}
+      >
+        <Link to="/">
+          <p>a</p>
+        </Link>
+        <h1 className="text-neutral-white font-medium text-center flex-1">
           {t("common.settings.title")}
         </h1>
       </div>
