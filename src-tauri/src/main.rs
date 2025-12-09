@@ -61,7 +61,6 @@ fn main() {
                                 button_state: MouseButtonState::Up,
                                 ..
                             } => {
-                                println!("left click pressed and released");
                                 let app = tray.app_handle();
                                 if let Some(window) = app.get_webview_window("main") {
                                     let _ = window.unminimize();
