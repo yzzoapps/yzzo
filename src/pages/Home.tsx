@@ -28,10 +28,11 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen">
       <nav
-        className={`flex flex-row items-center justify-between h-10 pb-8 ${PADDING_X} ${PADDING_Y}`}
+        className={`flex flex-row items-center justify-between border-b-[0.5px] border-gray-300 ${PADDING_X} py-3`}
       >
-        <Link to="/" className="h-8">
-          <img src="logo.svg" alt="Logo" className="h-full w-auto" />
+        <Link to="/" className="h-10 flex flex-row gap-1 items-center">
+          <img src="icon.svg" alt="Logo" className="h-full w-auto" />
+          <img src="text.svg" alt="Logo" className="h-5 w-auto" />
         </Link>
         <div className="flex flex-row gap-4 items-start">
           <Link to="/settings">
@@ -44,7 +45,7 @@ const Home = () => {
           {items.map((item, idx) => (
             <li
               key={idx}
-              className="py-3 px-4 w-full wrap-break-word text-sm text-primary border-b-[0.5px] border-gray-300"
+              className="py-3 px-4 w-full wrap-break-word text-sm text-neutral-black border-b-[0.5px] border-gray-300"
             >
               {item.content}
             </li>
