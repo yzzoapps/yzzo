@@ -10,7 +10,7 @@ const Settings = () => {
   return (
     <>
       <div
-        className={`bg-primary h-12 flex items-center justify-between ${PADDING_X} ${PADDING_Y}`}
+        className={`h-8 flex items-center justify-between ${PADDING_X} ${PADDING_Y}`}
       >
         <IconButton link="/" icon={HiChevronLeft} />
         <h1 className="text-neutral-white font-medium text-center flex-1">
