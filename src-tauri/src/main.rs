@@ -63,10 +63,16 @@ fn main() {
                             } => {
                                 let app = tray.app_handle();
                                 if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.unminimize();
-                                    let _ = window.show();
-                                    let _ = window.move_window(Position::TrayCenter).unwrap();
-                                    let _ = window.set_focus();
+                                    if let Ok(visible) = window.is_visible() {
+                                        if visible {
+                                            let _ = window.hide();
+                                        } else {
+                                            let _ = window.unminimize();
+                                            let _ = window.show();
+                                            let _ = window.move_window(Position::TrayCenter).ok();
+                                            let _ = window.set_focus();
+                                        }
+                                    }
                                 }
                             }
                             _ => {

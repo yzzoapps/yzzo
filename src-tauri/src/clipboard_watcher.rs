@@ -2,7 +2,7 @@ use arboard::Clipboard;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager, Runtime, Wry};
+use tauri::{AppHandle, Emitter, Wry};
 
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
     let last_text = Arc::new(Mutex::new(String::new()));
