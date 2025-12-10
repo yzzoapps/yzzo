@@ -8,7 +8,7 @@
 }
 
 @theme {
-  --font-ubuntu: "Mona Sans", "sans-serif";
+  --font-mona: "Mona Sans", "sans-serif";
   --color-primary: #00213e;
   --color-secondary: #18c2ff;
   --color-accent: #55e3ea;
