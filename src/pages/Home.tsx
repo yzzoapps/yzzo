@@ -44,7 +44,7 @@ const Home = () => {
           {items.map((item, idx) => (
             <li
               key={idx}
-              className="py-3 px-4 w-full wrap-break-word font-light text-sm text-primary border-b-[0.5px] border-gray-400"
+              className="py-3 px-4 w-full wrap-break-word text-sm text-primary border-b-[0.5px] border-gray-400"
             >
               {item.content}
             </li>
