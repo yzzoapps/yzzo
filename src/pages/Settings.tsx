@@ -1,7 +1,8 @@
-import { Link } from "@tanstack/react-router";
 import { SettingsItem } from "@yzzo/components";
+import IconButton from "@yzzo/components/IconButton";
 import { PADDING_X, PADDING_Y } from "@yzzo/styles/constants";
 import { useTranslation } from "react-i18next";
+import { HiChevronLeft } from "react-icons/hi";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -11,9 +12,7 @@ const Settings = () => {
       <div
         className={`bg-primary h-12 flex items-center justify-between ${PADDING_X} ${PADDING_Y}`}
       >
-        <Link to="/">
-          <p>a</p>
-        </Link>
+        <IconButton link="/" icon={HiChevronLeft} />
         <h1 className="text-neutral-white font-medium text-center flex-1">
           {t("common.settings.title")}
         </h1>
