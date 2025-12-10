@@ -3,7 +3,7 @@ import { getItems } from "@yzzo/api/tauriApi";
 import IconButton from "@yzzo/components/IconButton";
 import { useClipboardEventWatcher } from "@yzzo/hooks/clipboardWatcher";
 import { Item } from "@yzzo/models/Item";
-import { PADDING_X, PADDING_Y } from "@yzzo/styles/constants";
+import { PADDING_X, BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useEffect, useState } from "react";
 import { HiCog6Tooth } from "react-icons/hi2";
 
@@ -28,7 +28,7 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen">
       <nav
-        className={`flex flex-row items-center justify-between border-b-[0.5px] border-gray-300 ${PADDING_X} py-3`}
+        className={`flex flex-row items-center justify-between ${BORDER_BOTTOM} ${PADDING_X} py-3`}
       >
         <Link to="/" className="h-10 flex flex-row gap-1 items-center">
           <img src="icon.svg" alt="Logo" className="h-full w-auto" />
@@ -45,7 +45,7 @@ const Home = () => {
           {items.map((item, idx) => (
             <li
               key={idx}
-              className="py-3 px-4 w-full wrap-break-word text-sm text-neutral-black border-b-[0.5px] border-gray-300"
+              className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM}`}
             >
               {item.content}
             </li>
