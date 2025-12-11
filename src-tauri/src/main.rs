@@ -7,6 +7,9 @@ use tauri::{
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_clipboard_manager;
+use tauri_plugin_global_shortcut::{
+    Builder, Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+};
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
@@ -20,7 +23,28 @@ use db::setup_db;
 use state::AppState;
 
 fn main() {
+    // create the shortcut
+    let ctrl_n = Shortcut::new(Some(Modifiers::CONTROL), Code::KeyN);
+
+    // move it into the setup closure
+    let ctrl_n_for_setup = ctrl_n.clone();
+
+    let shortcut_plugin = Builder::new()
+        .with_handler({
+            let ctrl_n = ctrl_n.clone();
+            move |_app, shortcut, event| {
+                if shortcut == &ctrl_n {
+                    match event.state() {
+                        ShortcutState::Pressed => println!("Ctrl-N Pressed!"),
+                        ShortcutState::Released => println!("Ctrl-N Released!"),
+                    }
+                }
+            }
+        })
+        .build();
+
     let mut app = tauri::Builder::default()
+        .plugin(shortcut_plugin)
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--tray-only"]),
@@ -33,11 +57,15 @@ fn main() {
             items::add_item,
             items::bump_item
         ])
-        .setup(|app| {
+        .setup(move |app| {
             #[cfg(desktop)]
             {
+                // global shortcut
+                app.global_shortcut().register(ctrl_n_for_setup.clone())?;
+
                 let handle = app.handle().clone();
 
+                // database setup
                 tauri::async_runtime::spawn({
                     let db_handle = handle.clone();
                     async move {
@@ -46,14 +74,16 @@ fn main() {
                     }
                 });
 
+                // clipboard watcher
                 clipboard_watcher::start_clipboard_watcher(handle.clone());
 
-                // Autostart logic
+                // autostart logic
                 if !cfg!(debug_assertions) {
                     let autostart_manager = app.autolaunch();
                     let _ = autostart_manager.enable();
                 }
 
+                // tray icon setup
                 TrayIconBuilder::new()
                     .icon(app.default_window_icon().unwrap().clone())
                     .on_tray_icon_event(|tray, event| {
@@ -85,9 +115,9 @@ fn main() {
                         }
                     })
                     .build(app)?;
-
-                Ok(())
             }
+
+            Ok(())
         })
         .build(tauri::generate_context!())
         .expect("error building the tauri application");
