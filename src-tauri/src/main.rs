@@ -18,9 +18,16 @@ mod db;
 mod models;
 mod state;
 
+use commands::hotkeys::{get_hotkey, set_hotkey};
 use commands::{hotkeys, items};
 use db::setup_db;
 use state::AppState;
+
+#[cfg(target_os = "macos")]
+const DEFAULT_HOTKEY: &str = "Cmd+`";
+
+#[cfg(not(target_os = "macos"))]
+const DEFAULT_HOTKEY: &str = "Alt+`";
 
 fn main() {
     // create the shortcut
@@ -55,7 +62,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             items::get_items,
             items::add_item,
-            items::bump_item
+            items::bump_item,
+            hotkeys::set_hotkey,
+            hotkeys::get_hotkey
         ])
         .setup(move |app| {
             #[cfg(desktop)]
@@ -71,6 +80,23 @@ fn main() {
                     async move {
                         let db = setup_db(&db_handle).await;
                         db_handle.manage(AppState { db });
+
+                        let state = db_handle.state::<AppState>();
+
+                        // retrieve the stored hotkey or use the default one
+                        let hotkey = get_hotkey(state.clone())
+                            .await
+                            .unwrap_or_else(|_| DEFAULT_HOTKEY.to_string());
+
+                        // Set the hotkey for global shortcut or use the stored hotkey
+                        // You can replace the following line with whatever global shortcut functionality you use
+                        println!("Global Hotkey: {}", hotkey);
+
+                        // Optionally, set the default hotkey if none is set
+                        if hotkey == DEFAULT_HOTKEY {
+                            println!("set default hotkey");
+                            set_hotkey(state.clone(), hotkey).await.unwrap();
+                        }
                     }
                 });
 
