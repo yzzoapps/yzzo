@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, Link } from "@tanstack/react-router";
 import { HiChevronRight } from "react-icons/hi";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 
@@ -12,7 +12,9 @@ const SettingsItem: React.FC<SettingsItemProps> = ({ name, route }) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.navigate({ to: route });
+    console.log("Attempting to navigate to:", route);
+    console.log("Available routes:", router.routesById);
+    router.navigate({ to: route as any });
   };
 
   return (

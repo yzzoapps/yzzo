@@ -17,7 +17,10 @@ const Settings = () => {
           {t("common.settings.title")}
         </h1>
       </div>
-      <SettingsItem name={t("common.settings.hotkeys")} route={"/"} />
+      <SettingsItem
+        name={t("common.settings.hotkeys")}
+        route={"/settings/hotkeys"}
+      />
       <SettingsItem name={t("common.settings.preferences")} route={"/"} />
       <SettingsItem name={t("common.settings.privacy")} route={"/"} />
       <SettingsItem name={t("common.settings.about")} route={"/"} />
