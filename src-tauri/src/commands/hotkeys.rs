@@ -120,6 +120,8 @@ pub async fn set_hotkey(
     let new_shortcut =
         crate::parse_hotkey(&hotkey).map_err(|e| format!("Invalid hotkey: {}", e))?;
 
+    let _ = app.global_shortcut().unregister_all();
+
     let app_clone = app.clone();
     app.global_shortcut()
         .on_shortcut(new_shortcut, move |_app, _shortcut, event| {
