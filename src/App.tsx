@@ -4,7 +4,7 @@ import "./App.css";
 import { writeText, readText } from "@tauri-apps/plugin-clipboard-manager";
 import { getItems, addItem } from "@yzzo/api/tauriApi";
 import { Item } from "@yzzo/models/Item";
-import { useClipboardEventWatcher } from "@yzzo/hooks/clipboardWatcher";
+import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
