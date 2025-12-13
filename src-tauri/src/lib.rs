@@ -1,3 +1,4 @@
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{
     Manager,
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -5,6 +6,7 @@ use tauri::{
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
@@ -24,7 +26,8 @@ const DEFAULT_HOTKEY: &str = "Cmd+`";
 #[cfg(not(target_os = "macos"))]
 const DEFAULT_HOTKEY: &str = "Alt+`";
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
+
 pub fn run() {
     let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
@@ -40,7 +43,9 @@ pub fn run() {
             items::add_item,
             items::bump_item,
             hotkeys::set_hotkey,
-            hotkeys::get_hotkey
+            hotkeys::get_hotkey,
+            hotkeys::get_hold_behavior,
+            hotkeys::set_hold_behavior
         ])
         .setup(move |app| {
             #[cfg(desktop)]
@@ -49,6 +54,18 @@ pub fn run() {
 
                 tauri::async_runtime::block_on(async {
                     let db = setup_db(&handle).await;
+
+                    let hold_behavior = sqlx::query_as::<_, (String,)>(
+                        "SELECT value FROM settings WHERE key = 'hold_behavior'",
+                    )
+                    .fetch_optional(&db)
+                    .await
+                    .ok()
+                    .flatten()
+                    .map(|r| r.0 == "true")
+                    .unwrap_or(false);
+                    HOLD_BEHAVIOR.store(hold_behavior, Ordering::Relaxed);
+
                     handle.manage(AppState { db });
                 });
 
@@ -68,19 +85,34 @@ pub fn run() {
                         let handle_clone = handle.clone();
                         match handle.global_shortcut().on_shortcut(
                             shortcut,
-                            move |_app, _shortcut, _event| {
+                            move |_app, _shortcut, event| {
+                                let hold_mode = HOLD_BEHAVIOR.load(Ordering::Relaxed);
+
                                 if let Some(window) = handle_clone.get_webview_window("main") {
-                                    if let Ok(visible) = window.is_visible() {
-                                        if visible {
-                                            let _ = window.hide();
-                                        } else {
-                                            let _ = window.unminimize();
-                                            let _ = window.show();
-                                            let _ = window.set_focus();
+                                    if hold_mode {
+                                        match event.state() {
+                                            ShortcutState::Pressed => {
+                                                let _ = window.unminimize();
+                                                let _ = window.show();
+                                                let _ = window.set_focus();
+                                            }
+                                            ShortcutState::Released => {
+                                                let _ = window.hide();
+                                            }
+                                        }
+                                    } else {
+                                        if let ShortcutState::Pressed = event.state() {
+                                            if let Ok(visible) = window.is_visible() {
+                                                if visible {
+                                                    let _ = window.hide();
+                                                } else {
+                                                    let _ = window.unminimize();
+                                                    let _ = window.show();
+                                                    let _ = window.set_focus();
+                                                }
+                                            }
                                         }
                                     }
-                                } else {
-                                    eprintln!("[X] Window 'main' not found!");
                                 }
                             },
                         ) {

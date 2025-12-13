@@ -1,4 +1,6 @@
+use crate::HOLD_BEHAVIOR;
 use crate::state::AppState;
+use std::sync::atomic::Ordering;
 use tauri::{Manager, State};
 
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
@@ -96,6 +98,38 @@ pub async fn set_hotkey(
             }
         })
         .map_err(|e| format!("Failed to register shortcut: {}", e))?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_hold_behavior(state: State<'_, AppState>) -> Result<bool, String> {
+    // Read from database (for when frontend needs current setting)
+    let result =
+        sqlx::query_as::<_, (String,)>("SELECT value FROM settings WHERE key = 'hold_behavior'")
+            .fetch_optional(&state.db)
+            .await
+            .map_err(|e| e.to_string())?;
+
+    Ok(result.map(|r| r.0 == "true").unwrap_or(false))
+}
+
+#[tauri::command]
+pub async fn set_hold_behavior(
+    state: State<'_, AppState>,
+    hold_behavior: bool,
+) -> Result<(), String> {
+    let value = if hold_behavior { "true" } else { "false" };
+
+    // Save to database
+    sqlx::query("INSERT OR REPLACE INTO settings (key, value) VALUES ('hold_behavior', ?)")
+        .bind(value)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Update the atomic cache immediately
+    HOLD_BEHAVIOR.store(hold_behavior, Ordering::Relaxed);
 
     Ok(())
 }
