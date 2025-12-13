@@ -3,7 +3,7 @@ use crate::state::AppState;
 use std::sync::atomic::Ordering;
 use tauri::{Manager, State};
 
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 /// Parse a hotkey string (like "Cmd+`") into a `Shortcut` instance.
 pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
@@ -12,15 +12,58 @@ pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
 
     let parts: Vec<&str> = hotkey.split('+').collect();
 
-    for part in parts {
-        match part.trim().to_lowercase().as_str() {
+    for (i, part) in parts.iter().enumerate() {
+        let part_lower = part.trim().to_lowercase();
+
+        // check if it's a modifier
+        match part_lower.as_str() {
             "cmd" | "super" => modifiers.insert(Modifiers::SUPER),
             "ctrl" => modifiers.insert(Modifiers::CONTROL),
             "alt" => modifiers.insert(Modifiers::ALT),
-            "`" => key = Code::Backquote,
-            "a" => key = Code::KeyA,
-            "b" => key = Code::KeyB,
-            _ => return Err(format!("Unknown key or modifier: {}", part)),
+            "shift" => modifiers.insert(Modifiers::SHIFT),
+            _ => {
+                // it's the actual key (last part)
+                key = match part.trim() {
+                    "`" => Code::Backquote,
+                    "A" => Code::KeyA,
+                    "B" => Code::KeyB,
+                    "C" => Code::KeyC,
+                    "D" => Code::KeyD,
+                    "E" => Code::KeyE,
+                    "F" => Code::KeyF,
+                    "G" => Code::KeyG,
+                    "H" => Code::KeyH,
+                    "I" => Code::KeyI,
+                    "J" => Code::KeyJ,
+                    "K" => Code::KeyK,
+                    "L" => Code::KeyL,
+                    "M" => Code::KeyM,
+                    "N" => Code::KeyN,
+                    "O" => Code::KeyO,
+                    "P" => Code::KeyP,
+                    "Q" => Code::KeyQ,
+                    "R" => Code::KeyR,
+                    "S" => Code::KeyS,
+                    "T" => Code::KeyT,
+                    "U" => Code::KeyU,
+                    "V" => Code::KeyV,
+                    "W" => Code::KeyW,
+                    "X" => Code::KeyX,
+                    "Y" => Code::KeyY,
+                    "Z" => Code::KeyZ,
+                    "0" => Code::Digit0,
+                    "1" => Code::Digit1,
+                    "2" => Code::Digit2,
+                    "3" => Code::Digit3,
+                    "4" => Code::Digit4,
+                    "5" => Code::Digit5,
+                    "6" => Code::Digit6,
+                    "7" => Code::Digit7,
+                    "8" => Code::Digit8,
+                    "9" => Code::Digit9,
+                    _ => return Err(format!("Unsupported key: {}", part)),
+                };
+            }
         }
     }
 
@@ -53,7 +96,6 @@ pub async fn set_hotkey(
     state: State<'_, AppState>,
     hotkey: String,
 ) -> Result<(), String> {
-    // Get the old hotkey to unregister it
     let old_hotkey = get_hotkey(state.clone()).await.unwrap_or_else(|_| {
         #[cfg(target_os = "macos")]
         return "Cmd+`".to_string();
@@ -61,12 +103,10 @@ pub async fn set_hotkey(
         return "Alt+`".to_string();
     });
 
-    // Parse and unregister old shortcut
     if let Ok(old_shortcut) = crate::parse_hotkey(&old_hotkey) {
         let _ = app.global_shortcut().unregister(old_shortcut);
     }
 
-    // Save new hotkey to database
     let result = sqlx::query("INSERT OR REPLACE INTO settings (key, value) VALUES ('hotkey', ?)")
         .bind(&hotkey)
         .execute(&state.db)
@@ -77,22 +117,36 @@ pub async fn set_hotkey(
         return Err("Failed to update hotkey".to_string());
     }
 
-    // Parse and register new shortcut
     let new_shortcut =
         crate::parse_hotkey(&hotkey).map_err(|e| format!("Invalid hotkey: {}", e))?;
 
     let app_clone = app.clone();
     app.global_shortcut()
-        .on_shortcut(new_shortcut, move |_app, _shortcut, _event| {
-            println!("Shortcut pressed!");
+        .on_shortcut(new_shortcut, move |_app, _shortcut, event| {
+            let hold_mode = crate::HOLD_BEHAVIOR.load(Ordering::Relaxed);
             if let Some(window) = app_clone.get_webview_window("main") {
-                if let Ok(visible) = window.is_visible() {
-                    if visible {
-                        let _ = window.hide();
-                    } else {
-                        let _ = window.unminimize();
-                        let _ = window.show();
-                        let _ = window.set_focus();
+                if hold_mode {
+                    match event.state() {
+                        ShortcutState::Pressed => {
+                            let _ = window.unminimize();
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                        ShortcutState::Released => {
+                            let _ = window.hide();
+                        }
+                    }
+                } else {
+                    if let ShortcutState::Pressed = event.state() {
+                        if let Ok(visible) = window.is_visible() {
+                            if visible {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.unminimize();
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
                     }
                 }
             }
@@ -104,7 +158,6 @@ pub async fn set_hotkey(
 
 #[tauri::command]
 pub async fn get_hold_behavior(state: State<'_, AppState>) -> Result<bool, String> {
-    // Read from database (for when frontend needs current setting)
     let result =
         sqlx::query_as::<_, (String,)>("SELECT value FROM settings WHERE key = 'hold_behavior'")
             .fetch_optional(&state.db)
@@ -121,14 +174,12 @@ pub async fn set_hold_behavior(
 ) -> Result<(), String> {
     let value = if hold_behavior { "true" } else { "false" };
 
-    // Save to database
     sqlx::query("INSERT OR REPLACE INTO settings (key, value) VALUES ('hold_behavior', ?)")
         .bind(value)
         .execute(&state.db)
         .await
         .map_err(|e| e.to_string())?;
 
-    // Update the atomic cache immediately
     HOLD_BEHAVIOR.store(hold_behavior, Ordering::Relaxed);
 
     Ok(())
