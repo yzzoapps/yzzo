@@ -1,4 +1,3 @@
-// lib.rs
 use tauri::{
     Manager,
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -59,25 +58,19 @@ pub fn run() {
                 let state = handle.state::<AppState>();
                 let hotkey = tauri::async_runtime::block_on(async {
                     get_hotkey(state.clone()).await.unwrap_or_else(|e| {
-                        eprintln!("Failed to get hotkey from DB: {}, using default", e);
+                        eprintln!("[X] Failed to get hotkey from DB: {}, using default", e);
                         DEFAULT_HOTKEY.to_string()
                     })
                 });
 
-                println!("Attempting to register hotkey: {}", hotkey);
-
                 match parse_hotkey(&hotkey) {
                     Ok(shortcut) => {
-                        println!("Hotkey parsed successfully");
                         let handle_clone = handle.clone();
                         match handle.global_shortcut().on_shortcut(
                             shortcut,
                             move |_app, _shortcut, _event| {
-                                println!("Shortcut pressed!");
                                 if let Some(window) = handle_clone.get_webview_window("main") {
-                                    println!("Found window");
                                     if let Ok(visible) = window.is_visible() {
-                                        println!("Window visible: {}", visible);
                                         if visible {
                                             let _ = window.hide();
                                         } else {
@@ -87,17 +80,17 @@ pub fn run() {
                                         }
                                     }
                                 } else {
-                                    println!("Window 'main' not found!");
+                                    eprintln!("[X] Window 'main' not found!");
                                 }
                             },
                         ) {
                             Ok(_) => {
-                                println!("✓ Global shortcut registered successfully: {}", hotkey)
+                                println!("[V] Global shortcut registered successfully: {}", hotkey)
                             }
-                            Err(e) => eprintln!("✗ Failed to register global shortcut: {}", e),
+                            Err(e) => eprintln!("[X] Failed to register global shortcut: {}", e),
                         }
                     }
-                    Err(e) => eprintln!("✗ Failed to parse hotkey '{}': {}", hotkey, e),
+                    Err(e) => eprintln!("[X] Failed to parse hotkey '{}': {}", hotkey, e),
                 }
 
                 // tray icon setup
@@ -128,17 +121,15 @@ pub fn run() {
                                         }
                                     }
                                 }
-                                _ => {
-                                    println!("unhandled event {event:?}");
-                                }
+                                _ => {}
                             }
                         })
                         .build(app)
                     {
-                        eprintln!("Failed to build tray icon: {}", e);
+                        eprintln!("[X] Failed to build tray icon: {}", e);
                     }
                 } else {
-                    eprintln!("No default window icon available for tray");
+                    eprintln!("[X] No default window icon available for tray");
                 }
             }
 

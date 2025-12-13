@@ -15,13 +15,13 @@ pub async fn setup_db(app: &AppHandle) -> Database {
 
     let db_url = format!("sqlite:{}", path.to_str().unwrap());
 
-    println!("SQLite Database Path: {}", path.display());
+    println!("[I] SQLite Database Path: {}", path.display());
 
     if !Sqlite::database_exists(&db_url).await.unwrap_or(false) {
         Sqlite::create_database(&db_url)
             .await
             .expect("failed to create database");
-        println!("Database created at {}", path.display());
+        println!("[V] Database created at {}", path.display());
     }
 
     let pool = SqlitePoolOptions::new()
@@ -29,13 +29,13 @@ pub async fn setup_db(app: &AppHandle) -> Database {
         .await
         .expect("failed to connect to sqlite");
 
-    println!("Attempting to run migrations...");
+    println!("[I] Attempting to run migrations...");
 
     if let Err(e) = sqlx::migrate!("./migrations").run(&pool).await {
-        eprintln!("Migration failed: {}", e);
+        println!("[X] Migration failed: {}", e);
         panic!("Failed to run migrations");
     } else {
-        println!("Migrations applied successfully");
+        println!("[V] Migrations applied successfully");
     }
 
     pool
