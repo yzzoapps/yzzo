@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
@@ -14,7 +14,7 @@ mod db;
 mod models;
 mod state;
 
-use commands::hotkeys::{get_hotkey};
+use commands::hotkeys::{get_hotkey, parse_hotkey};
 use commands::{hotkeys, items};
 use db::setup_db;
 use state::AppState;
@@ -24,29 +24,6 @@ const DEFAULT_HOTKEY: &str = "Cmd+`";
 
 #[cfg(not(target_os = "macos"))]
 const DEFAULT_HOTKEY: &str = "Alt+`";
-
-/// Parse a hotkey string (like "Cmd+`") into a `Shortcut` instance.
-fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
-    let mut modifiers = Modifiers::empty();
-    let mut key = Code::KeyA; // Default key (to be replaced)
-
-    let parts: Vec<&str> = hotkey.split('+').collect();
-
-    for part in parts {
-        match part.trim().to_lowercase().as_str() {
-            "cmd" | "super" => modifiers.insert(Modifiers::SUPER),
-            "ctrl" => modifiers.insert(Modifiers::CONTROL),
-            "alt" => modifiers.insert(Modifiers::ALT),
-            "`" => key = Code::Backquote,
-            "a" => key = Code::KeyA,
-            "b" => key = Code::KeyB,
-            // Add more cases for other keys as needed
-            _ => return Err(format!("Unknown key or modifier: {}", part)),
-        }
-    }
-
-    Ok(Shortcut::new(Some(modifiers), key))
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -81,19 +58,46 @@ pub fn run() {
                 // Register global hotkey after state is managed
                 let state = handle.state::<AppState>();
                 let hotkey = tauri::async_runtime::block_on(async {
-                    get_hotkey(state.clone())
-                        .await
-                        .unwrap_or_else(|_| DEFAULT_HOTKEY.to_string())
+                    get_hotkey(state.clone()).await.unwrap_or_else(|e| {
+                        eprintln!("Failed to get hotkey from DB: {}, using default", e);
+                        DEFAULT_HOTKEY.to_string()
+                    })
                 });
+
+                println!("Attempting to register hotkey: {}", hotkey);
 
                 match parse_hotkey(&hotkey) {
                     Ok(shortcut) => {
-                        match handle.global_shortcut().register(shortcut) {
-                            Ok(_) => println!("Global shortcut registered: {}", hotkey),
-                            Err(e) => eprintln!("Failed to register global shortcut: {}", e),
+                        println!("Hotkey parsed successfully");
+                        let handle_clone = handle.clone();
+                        match handle.global_shortcut().on_shortcut(
+                            shortcut,
+                            move |_app, _shortcut, _event| {
+                                println!("Shortcut pressed!");
+                                if let Some(window) = handle_clone.get_webview_window("main") {
+                                    println!("Found window");
+                                    if let Ok(visible) = window.is_visible() {
+                                        println!("Window visible: {}", visible);
+                                        if visible {
+                                            let _ = window.hide();
+                                        } else {
+                                            let _ = window.unminimize();
+                                            let _ = window.show();
+                                            let _ = window.set_focus();
+                                        }
+                                    }
+                                } else {
+                                    println!("Window 'main' not found!");
+                                }
+                            },
+                        ) {
+                            Ok(_) => {
+                                println!("✓ Global shortcut registered successfully: {}", hotkey)
+                            }
+                            Err(e) => eprintln!("✗ Failed to register global shortcut: {}", e),
                         }
                     }
-                    Err(e) => eprintln!("Failed to parse hotkey '{}': {}", hotkey, e),
+                    Err(e) => eprintln!("✗ Failed to parse hotkey '{}': {}", hotkey, e),
                 }
 
                 // tray icon setup
@@ -117,7 +121,8 @@ pub fn run() {
                                             } else {
                                                 let _ = window.unminimize();
                                                 let _ = window.show();
-                                                let _ = window.move_window(Position::TrayCenter).ok();
+                                                let _ =
+                                                    window.move_window(Position::TrayCenter).ok();
                                                 let _ = window.set_focus();
                                             }
                                         }
