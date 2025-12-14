@@ -5,8 +5,6 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
-use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
@@ -80,49 +78,13 @@ pub fn run() {
                     })
                 });
 
+                // TODO change global_shortcut do default_hotkey
                 match parse_hotkey(&hotkey) {
-                    Ok(shortcut) => {
-                        let handle_clone = handle.clone();
-                        match handle.global_shortcut().on_shortcut(
-                            shortcut,
-                            move |_app, _shortcut, event| {
-                                let hold_mode = HOLD_BEHAVIOR.load(Ordering::Relaxed);
-
-                                if let Some(window) = handle_clone.get_webview_window("main") {
-                                    if hold_mode {
-                                        match event.state() {
-                                            ShortcutState::Pressed => {
-                                                let _ = window.unminimize();
-                                                let _ = window.show();
-                                                let _ = window.set_focus();
-                                            }
-                                            ShortcutState::Released => {
-                                                let _ = window.hide();
-                                            }
-                                        }
-                                    } else {
-                                        if let ShortcutState::Pressed = event.state() {
-                                            if let Ok(visible) = window.is_visible() {
-                                                if visible {
-                                                    let _ = window.hide();
-                                                } else {
-                                                    let _ = window.unminimize();
-                                                    let _ = window.show();
-                                                    let _ = window.set_focus();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        ) {
-                            Ok(_) => {
-                                println!("[V] Global shortcut registered successfully: {}", hotkey)
-                            }
-                            Err(e) => eprintln!("[X] Failed to register global shortcut: {}", e),
-                        }
-                    }
-                    Err(e) => eprintln!("[X] Failed to parse hotkey '{}': {}", hotkey, e),
+                    Ok(shortcut) => match hotkeys::register_hotkey_handler(&handle, shortcut) {
+                        Ok(_) => println!("[V] Global shortcut registered: {}", hotkey),
+                        Err(e) => eprintln!("Failed to register: {}", e),
+                    },
+                    Err(e) => eprintln!("Failed to parse hotkey: {}", e),
                 }
 
                 // tray icon setup
