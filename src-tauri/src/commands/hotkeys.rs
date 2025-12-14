@@ -1,9 +1,46 @@
 use crate::HOLD_BEHAVIOR;
 use crate::state::AppState;
 use std::sync::atomic::Ordering;
-use tauri::{Manager, State};
+use tauri::{AppHandle, Manager, State};
 
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+
+pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<(), String> {
+    let app_clone = app.clone();
+
+    app.global_shortcut()
+        .on_shortcut(shortcut, move |_app, _shortcut, event| {
+            let hold_mode = crate::HOLD_BEHAVIOR.load(Ordering::Relaxed);
+
+            if let Some(window) = app_clone.get_webview_window("main") {
+                if hold_mode {
+                    match event.state() {
+                        ShortcutState::Pressed => {
+                            let _ = window.unminimize();
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                        ShortcutState::Released => {
+                            let _ = window.hide();
+                        }
+                    }
+                } else {
+                    if let ShortcutState::Pressed = event.state() {
+                        if let Ok(visible) = window.is_visible() {
+                            if visible {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.unminimize();
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        .map_err(|e| format!("Failed to register shortcut: {}", e))
+}
 
 /// Parse a hotkey string (like "Cmd+`") into a `Shortcut` instance.
 pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
@@ -121,39 +158,7 @@ pub async fn set_hotkey(
         crate::parse_hotkey(&hotkey).map_err(|e| format!("Invalid hotkey: {}", e))?;
 
     let _ = app.global_shortcut().unregister_all();
-
-    let app_clone = app.clone();
-    app.global_shortcut()
-        .on_shortcut(new_shortcut, move |_app, _shortcut, event| {
-            let hold_mode = crate::HOLD_BEHAVIOR.load(Ordering::Relaxed);
-            if let Some(window) = app_clone.get_webview_window("main") {
-                if hold_mode {
-                    match event.state() {
-                        ShortcutState::Pressed => {
-                            let _ = window.unminimize();
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
-                        ShortcutState::Released => {
-                            let _ = window.hide();
-                        }
-                    }
-                } else {
-                    if let ShortcutState::Pressed = event.state() {
-                        if let Ok(visible) = window.is_visible() {
-                            if visible {
-                                let _ = window.hide();
-                            } else {
-                                let _ = window.unminimize();
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        .map_err(|e| format!("Failed to register shortcut: {}", e))?;
+    register_hotkey_handler(&app, new_shortcut)?;
 
     Ok(())
 }
