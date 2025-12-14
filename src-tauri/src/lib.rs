@@ -53,15 +53,7 @@ pub fn run() {
                 tauri::async_runtime::block_on(async {
                     let db = setup_db(&handle).await;
 
-                    let hold_behavior = sqlx::query_as::<_, (String,)>(
-                        "SELECT value FROM settings WHERE key = 'hold_behavior'",
-                    )
-                    .fetch_optional(&db)
-                    .await
-                    .ok()
-                    .flatten()
-                    .map(|r| r.0 == "true")
-                    .unwrap_or(false);
+                    let hold_behavior = hotkeys::load_hold_behavior_from_db(&db).await;
                     HOLD_BEHAVIOR.store(hold_behavior, Ordering::Relaxed);
 
                     handle.manage(AppState { db });
@@ -78,7 +70,6 @@ pub fn run() {
                     })
                 });
 
-                // TODO change global_shortcut do default_hotkey
                 match parse_hotkey(&hotkey) {
                     Ok(shortcut) => match hotkeys::register_hotkey_handler(&handle, shortcut) {
                         Ok(_) => println!("[V] Global shortcut registered: {}", hotkey),

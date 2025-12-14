@@ -1,5 +1,5 @@
-use crate::HOLD_BEHAVIOR;
 use crate::state::AppState;
+use crate::{HOLD_BEHAVIOR, state::DbPool};
 use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Manager, State};
 
@@ -161,6 +161,16 @@ pub async fn set_hotkey(
     register_hotkey_handler(&app, new_shortcut)?;
 
     Ok(())
+}
+
+pub async fn load_hold_behavior_from_db(db: &DbPool) -> bool {
+    sqlx::query_as::<_, (String,)>("SELECT value FROM settings WHERE key = 'hold_behavior'")
+        .fetch_optional(db)
+        .await
+        .ok()
+        .flatten()
+        .map(|r| r.0 == "true")
+        .unwrap_or(false)
 }
 
 #[tauri::command]
