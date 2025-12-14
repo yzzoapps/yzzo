@@ -42,14 +42,14 @@ pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<()
         .map_err(|e| format!("Failed to register shortcut: {}", e))
 }
 
-/// Parse a hotkey string (like "Cmd+`") into a `Shortcut` instance.
+// Parse a hotkey string (like "Cmd+`") into a `Shortcut` instance.
 pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
     let mut modifiers = Modifiers::empty();
     let mut key = Code::KeyA;
 
     let parts: Vec<&str> = hotkey.split('+').collect();
 
-    for (i, part) in parts.iter().enumerate() {
+    for part in parts.iter() {
         let part_lower = part.trim().to_lowercase();
 
         // check if it's a modifier
