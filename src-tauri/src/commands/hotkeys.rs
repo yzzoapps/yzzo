@@ -201,3 +201,7 @@ pub async fn set_hold_behavior(
 
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "./tests/hotkeys_test.rs"]
+mod hotkeys_test;

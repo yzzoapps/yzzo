@@ -1,0 +1,35 @@
+[test]
+preload = ["./src/test/setup.ts"]
+environment = "happy-dom"
+
+coverage = true
+coverageReporter = ["text", "lcov"]
+coverageDirectory = "./coverage"
+coverageThreshold = 0.8
+
+# from defaults in https://bun.com/docs/test/code-coverage#common-use-cases
+coveragePathIgnorePatterns = [
+  # Exclude utility files
+  "src/utils/**",
+
+  # Exclude configuration files
+  "*.config.js",
+  "webpack.config.ts",
+  "vite.config.ts",
+
+  # Exclude specific test patterns
+  "**/*.spec.ts",
+  "**/*.e2e.ts",
+
+  # Exclude build artifacts
+  "dist/**",
+  "build/**",
+
+  # Exclude generated files
+  "src/generated/**",
+  "**/*.generated.ts",
+
+  # Exclude vendor/third-party code
+  "vendor/**",
+  "third-party/**"
+]
