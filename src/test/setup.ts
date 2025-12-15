@@ -1,14 +1,11 @@
-import { Window } from "happy-dom";
-import { afterEach } from "bun:test";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, expect } from "bun:test";
 import { cleanup } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import * as matchers from "@testing-library/jest-dom/matchers";
 
-const window = new Window();
-const document = window.document;
+GlobalRegistrator.register();
 
-global.document = document as any;
-global.window = window as any;
-global.navigator = window.navigator as any;
+expect.extend(matchers);
 
 afterEach(() => {
   cleanup();
