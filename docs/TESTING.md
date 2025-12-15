@@ -7,6 +7,7 @@ This document covers testing for both frontend (TypeScript/React) and backend (R
 ## Quick Reference
 
 ### Frontend
+From the project root, run:
 ```bash
 bun test                           # Run all tests
 bun test:coverage                  # Run all tests with coverage
@@ -14,6 +15,8 @@ bun test:coverage                  # Run all tests with coverage
 
 ### Backend
 ```bash
+cd src-tauri
+
 cargo test                         # Run all tests
 cargo install cargo llvm-cov       # Install coverage tool
 cargo llvm-cov                     # Run all tests with coverage (terminal)
