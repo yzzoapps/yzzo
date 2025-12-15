@@ -10,7 +10,6 @@ This document covers testing for both frontend (TypeScript/React) and backend (R
 From the project root, run:
 ```bash
 bun test                           # Run all tests
-bun test:coverage                  # Run all tests with coverage
 ```
 
 ### Backend
@@ -49,9 +48,6 @@ From the project root, run:
 ```bash
 # Run all tests
 bun test
-
-# Run all tests with coverage
-bun test:coverage
 
 # Run specific test file
 bun test src/hooks/__tests__/useGlobalHotkey.test.ts
