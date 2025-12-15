@@ -1,11 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { getItems } from "@yzzo/api/tauriApi";
-import IconButton from "@yzzo/components/IconButton";
-import { useClipboardEventWatcher } from "@yzzo/hooks/clipboardWatcher";
+import { Header } from "@yzzo/components";
+import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 import { Item } from "@yzzo/models/Item";
-import { PADDING_X, BORDER_BOTTOM } from "@yzzo/styles/constants";
+import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useEffect, useState } from "react";
-import { HiCog6Tooth } from "react-icons/hi2";
 
 const Home = () => {
   const [items, setItems] = useState<Item[]>([]);
@@ -27,19 +25,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <nav
-        className={`flex flex-row items-center justify-between ${BORDER_BOTTOM} ${PADDING_X} py-3`}
-      >
-        <Link to="/" className="h-10 flex flex-row gap-1 items-center">
-          <img src="icon.svg" alt="Logo" className="h-full w-auto" />
-          <img src="text.svg" alt="Logo" className="h-5 w-auto" />
-        </Link>
-        <div className="flex flex-row gap-4 items-start">
-          <Link to="/settings">
-            <IconButton icon={HiCog6Tooth} onClick={() => {}} />
-          </Link>
-        </div>
-      </nav>
+      <Header type="primary" />
       <div className="flex-1 overflow-y-auto">
         <ul className="w-full">
           {items.map((item, idx) => (

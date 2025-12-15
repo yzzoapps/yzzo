@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useGlobalHotkey } from "@yzzo/hooks/useGlobalHotkey";
+import { Header } from "@yzzo/components";
+import { useTranslation } from "react-i18next";
 
 const Hotkeys: React.FC = () => {
   const { hotkey, holdBehavior, isLoading, updateHotkey, updateHoldBehavior } =
     useGlobalHotkey();
   const [isListening, setIsListening] = useState(false);
   const [currentCombination, setCurrentCombination] = useState<string>("");
+  const { t } = useTranslation();
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!isListening) return;
@@ -78,8 +81,11 @@ const Hotkeys: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Hotkey Settings</h2>
+    <div>
+      <Header
+        title={t("common.settings.hotkeys")}
+        previousRoute={"/settings"}
+      />
 
       <div className="mb-6">
         <label className="block text-sm font-medium mb-2">Global Hotkey</label>
