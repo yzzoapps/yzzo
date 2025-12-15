@@ -1,22 +1,12 @@
-import { SettingsItem } from "@yzzo/components";
-import IconButton from "@yzzo/components/IconButton";
-import { PADDING_X, PADDING_Y } from "@yzzo/styles/constants";
+import { Header, SettingsItem } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
-import { HiChevronLeft } from "react-icons/hi";
 
 const Settings = () => {
   const { t } = useTranslation();
 
   return (
     <>
-      <div
-        className={`h-8 flex items-center justify-between ${PADDING_X} ${PADDING_Y}`}
-      >
-        <IconButton link="/" icon={HiChevronLeft} />
-        <h1 className="text-primary font-medium text-center flex-1">
-          {t("common.settings.title")}
-        </h1>
-      </div>
+      <Header title={t("common.settings.title")} previousRoute={"/"} />
       <SettingsItem
         name={t("common.settings.hotkeys")}
         route={"/settings/hotkeys"}
