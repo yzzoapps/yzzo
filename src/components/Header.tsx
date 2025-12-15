@@ -29,11 +29,14 @@ const Header: React.FC<HeaderProps> = ({
       {type == "secondary" ? (
         <>
           {previousRoute && (
-            <IconButton link={previousRoute} icon={HiChevronLeft} />
+            <div className="absolute left-4">
+              <IconButton
+                link={previousRoute}
+                icon={{ type: HiChevronLeft, size: 6, background: true }}
+              />
+            </div>
           )}
-          <h1 className="text-primary font-bold text-center flex-1 text-lg">
-            {title}
-          </h1>
+          <h1 className="text-primary font-semibold text-center">{title}</h1>
         </>
       ) : (
         <>
@@ -42,9 +45,10 @@ const Header: React.FC<HeaderProps> = ({
             <img src="text.svg" alt="Logo" className="h-5 w-auto" />
           </Link>
           <div className="flex flex-row gap-4 items-start">
-            <Link to="/settings">
-              <IconButton icon={HiCog6Tooth} onClick={() => {}} />
-            </Link>
+            <IconButton
+              icon={{ type: HiCog6Tooth, background: false }}
+              link="/settings"
+            />
           </div>
         </>
       )}
