@@ -110,7 +110,7 @@ pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
 #[tauri::command]
 pub async fn get_hotkey(state: State<'_, AppState>) -> Result<String, String> {
     let result: Option<(String,)> =
-        sqlx::query_as("SELECT value FROM settings WHERE key = 'global_shortcut' LIMIT 1")
+        sqlx::query_as("SELECT value FROM settings WHERE key = 'hotkey' LIMIT 1")
             .fetch_optional(&state.db)
             .await
             .map_err(|e| e.to_string())?;
