@@ -4,7 +4,8 @@
       "title": "Atalho global",
       "listeningPlaceholder": "Pressione as teclas...",
       "helperText": "Pressione este atalho para abrir o aplicativo.",
-      "change": "Alterar"
+      "change": "Alterar",
+      "behavior": "Comportamento do atalho"
     }
   }
 }

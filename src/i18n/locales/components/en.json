@@ -4,7 +4,8 @@
       "title": "Global hotkey",
       "listeningPlaceholder": "Press keys...",
       "helperText": "Use this hotkey to open the app.",
-      "change": "Change"
+      "change": "Change",
+      "behavior": "Hotkey behavior"
     }
   }
 }

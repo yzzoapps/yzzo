@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useGlobalHotkey } from "@yzzo/hooks/useGlobalHotkey";
-import { Button, Header, Input } from "@yzzo/components";
+import { Button, Header, Input, Label } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 
 const Hotkeys: React.FC = () => {
@@ -114,6 +114,7 @@ const Hotkeys: React.FC = () => {
         </div>
 
         <div className="mb-6">
+          <Label label={t("components.settings.hotkey.behavior")} />
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
