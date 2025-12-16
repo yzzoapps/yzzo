@@ -1,11 +1,11 @@
 import { HiChevronLeft } from "react-icons/hi";
-import IconButton from "./IconButton";
 import {
   HEADER_CONTAINER_PRIMARY,
   HEADER_CONTAINER_SECONDARY,
 } from "@yzzo/styles/constants";
 import { Link } from "@tanstack/react-router";
 import { HiCog6Tooth } from "react-icons/hi2";
+import { IconButton } from "@yzzo/components";
 
 interface HeaderProps {
   type?: "primary" | "secondary";
