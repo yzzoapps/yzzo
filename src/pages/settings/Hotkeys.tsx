@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useGlobalHotkey } from "@yzzo/hooks/useGlobalHotkey";
-import { Header } from "@yzzo/components";
+import { Button, Header, Input } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 
 const Hotkeys: React.FC = () => {
@@ -65,7 +65,7 @@ const Hotkeys: React.FC = () => {
   }, [isListening, currentCombination]);
 
   const handleChangeHotkey = () => {
-    setIsListening(true);
+    setIsListening(!isListening);
   };
 
   const handleHoldBehaviorToggle = async (enabled: boolean) => {
@@ -87,50 +87,50 @@ const Hotkeys: React.FC = () => {
         previousRoute={"/settings"}
       />
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Global Hotkey</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={isListening ? currentCombination || "Press keys..." : hotkey}
-            readOnly
-            className="flex-1 px-3 py-2 border rounded bg-gray-50"
-            placeholder="No hotkey set"
-          />
-          <button
-            onClick={handleChangeHotkey}
-            disabled={isListening}
-            className={`px-4 py-2 rounded font-medium ${
-              isListening
-                ? "bg-red-500 text-white cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            {isListening ? "Listening..." : "Change"}
-          </button>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">
-          Click "Change" and press your desired key combination
-        </p>
-      </div>
-
-      <div className="mb-6">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={holdBehavior}
-            onChange={(e) => handleHoldBehaviorToggle(e.target.checked)}
-            className="w-4 h-4 cursor-pointer"
-          />
-          <div>
-            <span className="font-medium">Hold to show</span>
-            <p className="text-xs text-gray-500">
-              {holdBehavior
-                ? "Window shows while holding hotkey, hides on release"
-                : "Press hotkey to toggle window visibility"}
-            </p>
+      <div className="flex flex-col gap-4 p-4">
+        <div>
+          <div className="flex flex-row w-full">
+            <Input
+              label={t("components.settings.hotkey.title")}
+              readOnly
+              value={
+                isListening
+                  ? currentCombination ||
+                    t("components.settings.hotkey.listeningPlaceholder")
+                  : hotkey
+              }
+              helperText={t("components.settings.hotkey.helperText")}
+              className="w-2/3"
+              attachedToButton
+            />
+            <Button
+              variant={isListening ? "danger" : "default"}
+              onClick={handleChangeHotkey}
+              className="w-1/3 self-end mb-6"
+              label={isListening ? "Cancel" : "Change"}
+              attachedToInput
+            />
           </div>
-        </label>
+        </div>
+
+        <div className="mb-6">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={holdBehavior}
+              onChange={(e) => handleHoldBehaviorToggle(e.target.checked)}
+              className="w-4 h-4 cursor-pointer"
+            />
+            <div>
+              <span className="font-medium">Hold to show</span>
+              <p className="text-xs text-gray-500">
+                {holdBehavior
+                  ? "Window shows while holding hotkey, hides on release"
+                  : "Press hotkey to toggle window visibility"}
+              </p>
+            </div>
+          </label>
+        </div>
       </div>
     </div>
   );
