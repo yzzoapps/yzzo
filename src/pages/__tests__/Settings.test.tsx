@@ -1,0 +1,195 @@
+import { test, expect, describe, beforeEach, mock } from "bun:test";
+import { waitFor, within } from "@testing-library/react";
+import { render } from "@yzzo/test/utils/test-utils";
+import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
+import Settings from "@yzzo/pages/Settings";
+
+mock.module("@yzzo/components", () => ({
+  Header: ({ title, previousRoute }: any) => (
+    <header data-testid="header">
+      <h1>{title}</h1>
+      <a href={previousRoute} data-testid="back-link">
+        Back
+      </a>
+    </header>
+  ),
+  SettingsItem: ({ name, route }: any) => (
+    <a href={route} data-testid="settings-item">
+      {name}
+    </a>
+  ),
+}));
+
+describe("Settings page (English)", () => {
+  beforeEach(() => {
+    setupI18nMock("en");
+  });
+
+  test("should render all settings items", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      expect(within(container).getByText("Hotkeys")).toBeInTheDocument();
+      expect(within(container).getByText("Preferences")).toBeInTheDocument();
+      expect(within(container).getByText("Privacy")).toBeInTheDocument();
+      expect(within(container).getByText("About")).toBeInTheDocument();
+    });
+  });
+
+  test("header should have the correct title", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const header = within(container).getByTestId("header");
+      expect(header).toHaveTextContent("Settings");
+    });
+  });
+
+  test("header should have the correct previousRoute", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const backLink = within(container).getByTestId("back-link");
+      expect(backLink).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("hotkeys item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Hotkeys");
+      expect(hotkeysItem).toHaveAttribute("href", "/settings/hotkeys");
+    });
+  });
+
+  test("preferences item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Preferences");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("privacy item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Privacy");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("about item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("About");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+});
+
+describe("Settings Page (Portuguese)", () => {
+  beforeEach(() => {
+    setupI18nMock("pt");
+  });
+
+  test("should render all settings items", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      expect(within(container).getByText("Atalhos")).toBeInTheDocument();
+      expect(within(container).getByText("Preferências")).toBeInTheDocument();
+      expect(within(container).getByText("Privacidade")).toBeInTheDocument();
+      expect(within(container).getByText("Sobre")).toBeInTheDocument();
+    });
+  });
+
+  test("header should have the correct title", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const header = within(container).getByTestId("header");
+      expect(header).toHaveTextContent("Configurações");
+    });
+  });
+
+  test("header should have the correct previousRoute", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const backLink = within(container).getByTestId("back-link");
+      expect(backLink).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("hotkeys item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Atalhos");
+      expect(hotkeysItem).toHaveAttribute("href", "/settings/hotkeys");
+    });
+  });
+
+  test("preferences item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Preferências");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("privacy item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Privacidade");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+
+  test("about item should have the correct route", async () => {
+    const { container } = render(<Settings />);
+
+    await waitFor(() => {
+      const hotkeysItem = within(container).getByText("Sobre");
+      expect(hotkeysItem).toHaveAttribute("href", "/");
+    });
+  });
+});
+
+describe("Settings page (Translation keys)", () => {
+  describe("common", () => {
+    test("all Settings page keys should exist in English", () => {
+      const keysToCheck = [
+        "common.settings.title",
+        "common.settings.hotkeys",
+        "common.settings.preferences",
+        "common.settings.privacy",
+        "common.settings.about",
+      ];
+
+      keysToCheck.forEach((key) => {
+        expect(hasTranslationKey(key, "en")).toBe(true);
+      });
+    });
+
+    test("all Settings page keys should exist in Portuguese", () => {
+      const keysToCheck = [
+        "common.settings.title",
+        "common.settings.hotkeys",
+        "common.settings.preferences",
+        "common.settings.privacy",
+        "common.settings.about",
+      ];
+
+      keysToCheck.forEach((key) => {
+        expect(hasTranslationKey(key, "pt")).toBe(true);
+      });
+    });
+  });
+});
