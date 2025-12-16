@@ -1,5 +1,4 @@
 export * from "./settings";
 export * from "./ui/forms";
-export { default as Button } from "./Button";
-export { default as IconButton } from "./IconButton";
+export * from "./ui/buttons";
 export { default as Header } from "./Header";
