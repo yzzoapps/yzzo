@@ -91,7 +91,7 @@ describe("Settings page (English)", () => {
   });
 });
 
-describe("Settings Page (Portuguese)", () => {
+describe("Settings page (Portuguese)", () => {
   beforeEach(() => {
     setupI18nMock("pt");
   });
