@@ -4,6 +4,8 @@ import { render } from "@yzzo/test/utils/test-utils";
 import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
 import Settings from "@yzzo/pages/Settings";
 
+// TODO colocar settings como pagina "index" dentro de hotkeys
+//
 mock.module("@yzzo/components", () => ({
   Header: ({ title, previousRoute }: any) => (
     <header data-testid="header">
@@ -36,7 +38,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("header should have the correct title", async () => {
+  test("should render header with the correct title", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
@@ -45,7 +47,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("header should have the correct previousRoute", async () => {
+  test("should render header with the correct previousRoute", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
@@ -54,7 +56,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("hotkeys item should have the correct route", async () => {
+  test("should render hotkeys item with the correct route", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
@@ -63,7 +65,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("preferences item should have the correct route", async () => {
+  test("should render preferences item with the correct route", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
@@ -72,7 +74,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("privacy item should have the correct route", async () => {
+  test("should render privacy item with correct route", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
@@ -81,7 +83,7 @@ describe("Settings page (English)", () => {
     });
   });
 
-  test("about item should have the correct route", async () => {
+  test("should render about item with the correct route", async () => {
     const { container } = render(<Settings />);
 
     await waitFor(() => {
