@@ -1,3 +1,4 @@
+import { HelperText, Label } from "@yzzo/components";
 import React from "react";
 
 interface InputProps {
@@ -21,7 +22,7 @@ const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-1">
-      <label className="block text-sm font-medium">{label}</label>
+      {label && <Label label={label} />}
       <input
         type="text"
         value={value}
@@ -32,7 +33,7 @@ const Input: React.FC<InputProps> = ({
           ${attachedToButton ? "rounded-r-none" : ""}
           ${className}`}
       />
-      {helperText && <p className="text-xs text-gray-500 mt-1">{helperText}</p>}
+      {helperText && <HelperText text={helperText} />}
     </div>
   );
 };
