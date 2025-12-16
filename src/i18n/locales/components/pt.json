@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "hotkey": {
+      "title": "Atalho global",
+      "listeningPlaceholder": "Pressione as teclas...",
+      "helperText": "Pressione este atalho para abrir o aplicativo.",
+      "change": "Alterar"
+    }
+  }
+}
