@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from "bun:test";
-import { act, render, renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useGlobalHotkey } from "../useGlobalHotkey";
 import type { InvokeArgs } from "@tauri-apps/api/core";
 
