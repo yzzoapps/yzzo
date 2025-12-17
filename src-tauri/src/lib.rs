@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_positioner::{self, Position, WindowExt};
+use tauri_plugin_positioner::{self};
 
 mod clipboard_watcher;
 mod commands;
@@ -22,7 +22,7 @@ use state::AppState;
 const DEFAULT_HOTKEY: &str = "Cmd+`";
 
 #[cfg(not(target_os = "macos"))]
-const DEFAULT_HOTKEY: &str = "Alt+`";
+const DEFAULT_HOTKEY: &str = "Alt+'";
 
 pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
 
