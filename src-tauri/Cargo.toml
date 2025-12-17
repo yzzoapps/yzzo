@@ -2,7 +2,7 @@
 name = "YZZO"
 version = "0.1.0"
 description = "YZZO, a clipboard manager built for simplicity and productivity."
-authors = ["Yzzo Apps"]
+authors = ["YZZO Apps"]
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
