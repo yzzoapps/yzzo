@@ -27,7 +27,7 @@ const DEFAULT_HOTKEY: &str = "Alt+`";
 pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
 
 pub fn run() {
-    let mut app = tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--tray-only"]),
