@@ -116,6 +116,15 @@ pub fn run() {
                 } else {
                     eprintln!("[X] No default window icon available for tray");
                 }
+
+                // on Linux, show the window by default since tray behavior is unreliable
+                #[cfg(target_os = "linux")]
+                {
+                    if let Some(window) = handle.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
             }
 
             Ok(())
