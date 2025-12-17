@@ -99,8 +99,11 @@ pub fn run() {
                                             } else {
                                                 let _ = window.unminimize();
                                                 let _ = window.show();
-                                                let _ =
-                                                    window.move_window(Position::TrayCenter).ok();
+                                                #[cfg(target_os = "macos")]
+                                                {
+                                                    let _ =
+                                                        window.move_window(Position::TrayCenter);
+                                                }
                                                 let _ = window.set_focus();
                                             }
                                         }
@@ -121,6 +124,7 @@ pub fn run() {
                 #[cfg(target_os = "linux")]
                 {
                     if let Some(window) = handle.get_webview_window("main") {
+                        let _ = window.set_resizable(true);
                         let _ = window.show();
                         let _ = window.set_focus();
                     }

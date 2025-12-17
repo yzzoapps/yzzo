@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "yzzo",
+  "productName": "YZZO",
   "version": "0.1.0",
   "identifier": "io.yzzo.yzzo",
   "build": {
@@ -10,12 +10,16 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "trayIcon": {
+      "iconAsTemplate": false,
+      "iconPath": "icons/icon.png"
+    },
     "windows": [
       {
         "label": "main",
         "visible": false,
-        "resizable": false,
         "closable": false,
+        "resizable": false,
         "maximizable": false,
         "minimizable": false,
         "width": 320,
@@ -36,8 +40,17 @@
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "linux": {
+      "deb": {
+        "desktopTemplate": "./template.desktop"
+      },
+      "rpm": {
+        "desktopTemplate": "./template.desktop"
+      }
+    }
   },
   "plugins": {
     "clipboard": {
