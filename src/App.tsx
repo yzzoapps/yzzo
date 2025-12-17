@@ -8,7 +8,7 @@ import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [_name, setName] = useState("");
   const [items, setItems] = useState<Item[]>([]);
   const clipboardText = useClipboardEventWatcher();
 
