@@ -3,9 +3,9 @@ use sqlx::FromRow;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Item {
-    id: u16,
-    content: String,
-    created_at: String,
-    updated_at: String,
-    bumped_at: String,
+    pub id: u16,
+    pub content: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub bumped_at: String,
 }

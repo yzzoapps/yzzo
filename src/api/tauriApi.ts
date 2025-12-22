@@ -17,3 +17,11 @@ export async function getItems(): Promise<Item[]> {
     return [];
   }
 }
+
+export async function bumpItem(id: number): Promise<void> {
+  try {
+    await invoke("bump_item", { id });
+  } catch (err) {
+    console.error("Failed to bump item:", err);
+  }
+}

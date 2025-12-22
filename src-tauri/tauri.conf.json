@@ -21,7 +21,7 @@
         "closable": false,
         "resizable": false,
         "maximizable": false,
-        "minimizable": false,
+        "minimizable": true,
         "width": 320,
         "height": 560,
         "title": "YZZO - Clipboard Manager",

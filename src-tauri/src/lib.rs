@@ -129,6 +129,13 @@ pub fn run() {
                         let _ = window.set_focus();
                     }
                 }
+
+                // #[cfg(target_os = "macos")]
+                // {
+                //     if let Some(window) = handle.get_webview_window("main") {
+                //         let _ = window.set_minimizable(false);
+                //     }
+                // }
             }
 
             Ok(())
