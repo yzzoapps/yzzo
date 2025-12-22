@@ -1,4 +1,9 @@
 {
+  "home": {
+    "searchPlaceholder": "Type to search...",
+    "noResults": "No results found",
+    "noItems": "No items yet"
+  },
   "settings": {
     "hotkey": {
       "title": "Global hotkey",
