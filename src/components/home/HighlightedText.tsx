@@ -14,7 +14,7 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, query }) => {
     <>
       {parts.map((part, index) =>
         part.toLowerCase() === query.toLowerCase() ? (
-          <mark key={index} className="bg-yellow-300 text-neutral-black">
+          <mark key={index} className="bg-accent text-primary">
             {part}
           </mark>
         ) : (
