@@ -1,4 +1,9 @@
 {
+  "home": {
+    "searchPlaceholder": "Digite para pesquisar...",
+    "noResults": "Nenhum resultado encontrado",
+    "noItems": "Nenhum item ainda"
+  },
   "settings": {
     "hotkey": {
       "title": "Atalho global",

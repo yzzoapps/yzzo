@@ -4,8 +4,10 @@ import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 import { Item } from "@yzzo/models/Item";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +67,7 @@ const Home = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Type to search..."
+          placeholder={t("components.home.searchPlaceholder")}
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -82,7 +84,9 @@ const Home = () => {
             ))
           ) : (
             <li className="py-8 px-4 text-center text-sm text-gray-500">
-              {searchQuery ? "No results found" : "No items yet"}
+              {searchQuery
+                ? t("components.home.noResults")
+                : t("components.home.noItems")}
             </li>
           )}
         </ul>
