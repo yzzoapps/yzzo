@@ -4,7 +4,6 @@ import { render } from "@yzzo/test/utils/test-utils";
 import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
 import Settings from "@yzzo/pages/settings";
 
-// TODO navegar com a seta e salvar no enter
 mock.module("@yzzo/components", () => ({
   Header: ({ title, previousRoute, type = "secondary" }: any) => (
     <header data-testid="header" data-type={type}>
