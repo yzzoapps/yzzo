@@ -7,13 +7,15 @@ const Settings = () => {
   return (
     <>
       <Header title={t("common.settings.title")} previousRoute={"/"} />
-      <SettingsItem
-        name={t("common.settings.hotkeys")}
-        route={"/settings/hotkeys"}
-      />
-      <SettingsItem name={t("common.settings.preferences")} route={"/"} />
-      <SettingsItem name={t("common.settings.privacy")} route={"/"} />
-      <SettingsItem name={t("common.settings.about")} route={"/"} />
+      <ul>
+        <SettingsItem
+          name={t("common.settings.hotkeys")}
+          route={"/settings/hotkeys"}
+        />
+        <SettingsItem name={t("common.settings.preferences")} route={"/"} />
+        <SettingsItem name={t("common.settings.privacy")} route={"/"} />
+        <SettingsItem name={t("common.settings.about")} route={"/"} />
+      </ul>
     </>
   );
 };
