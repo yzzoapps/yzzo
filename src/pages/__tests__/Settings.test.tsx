@@ -2,10 +2,10 @@ import { test, expect, describe, beforeEach, mock } from "bun:test";
 import { waitFor, within } from "@testing-library/react";
 import { render } from "@yzzo/test/utils/test-utils";
 import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
-import Settings from "@yzzo/pages/Settings";
+import Settings from "@yzzo/pages/settings";
 
-// TODO colocar settings como pagina "index" dentro de hotkeys
-//
+// TODO MUDAR ESTRUTURA DESSE TESTE PARA CONTENT, PAGE que nem o home
+// TODO navegar com a seta e salvar no enter
 mock.module("@yzzo/components", () => ({
   Header: ({ title, previousRoute }: any) => (
     <header data-testid="header">
