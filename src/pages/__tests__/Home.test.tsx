@@ -27,7 +27,7 @@ mock.module("@yzzo/components", () => ({
       <>
         {parts.map((part: string, index: number) =>
           part.toLowerCase() === query.toLowerCase() ? (
-            <mark key={index} className="bg-yellow-300">
+            <mark key={index} className="bg-accent text-primary">
               {part}
             </mark>
           ) : (
