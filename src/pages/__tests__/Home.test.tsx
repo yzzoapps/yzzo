@@ -88,6 +88,34 @@ describe("Home page", () => {
     });
   });
 
+  describe("Translation keys", () => {
+    describe("components", () => {
+      test("all Home page keys should exist in English", () => {
+        const keysToCheck = [
+          "components.home.searchPlaceholder",
+          "components.home.noResults",
+          "components.home.noItems",
+        ];
+
+        keysToCheck.forEach((key) => {
+          expect(hasTranslationKey(key, "en")).toBe(true);
+        });
+      });
+
+      test("all Home page keys should exist in Portuguese", () => {
+        const keysToCheck = [
+          "components.home.searchPlaceholder",
+          "components.home.noResults",
+          "components.home.noItems",
+        ];
+
+        keysToCheck.forEach((key) => {
+          expect(hasTranslationKey(key, "pt")).toBe(true);
+        });
+      });
+    });
+  });
+
   describe("Content (English)", () => {
     beforeEach(() => {
       setupI18nMock("en");
@@ -243,34 +271,6 @@ describe("Home page", () => {
           within(container).getByText("Primeiro item"),
         ).toBeInTheDocument();
         expect(within(container).getByText("Segundo item")).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Translation keys", () => {
-    describe("components", () => {
-      test("all Home page keys should exist in English", () => {
-        const keysToCheck = [
-          "components.home.searchPlaceholder",
-          "components.home.noResults",
-          "components.home.noItems",
-        ];
-
-        keysToCheck.forEach((key) => {
-          expect(hasTranslationKey(key, "en")).toBe(true);
-        });
-      });
-
-      test("all Home page keys should exist in Portuguese", () => {
-        const keysToCheck = [
-          "components.home.searchPlaceholder",
-          "components.home.noResults",
-          "components.home.noItems",
-        ];
-
-        keysToCheck.forEach((key) => {
-          expect(hasTranslationKey(key, "pt")).toBe(true);
-        });
       });
     });
   });
