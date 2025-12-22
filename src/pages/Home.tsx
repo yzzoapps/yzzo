@@ -1,21 +1,67 @@
-import { getItems } from "@yzzo/api/tauriApi";
+import { getItems, bumpItem } from "@yzzo/api/tauriApi";
 import { Header, HighlightedText } from "@yzzo/components";
 import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 import { Item } from "@yzzo/models/Item";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const selectedItemRef = useRef<HTMLLIElement>(null);
   const clipboardText = useClipboardEventWatcher();
+
+  const filteredItems = items.filter((item) =>
+    item.content.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  useEffect(() => {
+    selectedItemRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+  }, [selectedIndex]);
 
   // global keydown listener - focus input when user starts typing
   useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+    const handleGlobalKeyDown = async (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          if (e.key === "ArrowDown") {
+            return Math.min(prev + 1, filteredItems.length - 1);
+          } else {
+            return Math.max(prev - 1, 0);
+          }
+        });
+        return;
+      }
+
+      if (e.key === "Enter" && filteredItems.length > 0) {
+        e.preventDefault();
+        const selectedItem = filteredItems[selectedIndex];
+        if (selectedItem) {
+          await bumpItem(selectedItem.id);
+          await writeText(selectedItem.content);
+
+          setSearchQuery("");
+          searchInputRef.current?.blur();
+
+          try {
+            await getCurrentWindow().minimize();
+          } catch (error) {
+            console.error("Failed to hide window:", error);
+          }
+        }
+        return;
+      }
+
       // ignore if modifier keys are pressed (Ctrl, Alt, Cmd)
       if (e.ctrlKey || e.altKey || e.metaKey) return;
 
@@ -38,11 +84,7 @@ const Home = () => {
 
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, []);
-
-  const filteredItems = items.filter((item) =>
-    item.content.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  }, [filteredItems, selectedIndex]);
 
   useEffect(() => {
     (async () => {
@@ -77,7 +119,10 @@ const Home = () => {
             filteredItems.map((item, idx) => (
               <li
                 key={idx}
-                className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM}`}
+                ref={idx === selectedIndex ? selectedItemRef : null}
+                className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM} ${
+                  idx === selectedIndex ? "bg-blue-100" : ""
+                }`}
               >
                 <HighlightedText text={item.content} query={searchQuery} />
               </li>

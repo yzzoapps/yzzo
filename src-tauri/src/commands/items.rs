@@ -5,6 +5,29 @@ use crate::models::Item;
 
 #[tauri::command]
 pub async fn add_item(state: State<'_, AppState>, content: String) -> Result<(), String> {
+    // check if an item with the same content already exists
+    let existing: Option<Item> = sqlx::query_as::<_, Item>("SELECT * FROM items WHERE content = ?")
+        .bind(&content)
+        .fetch_optional(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // if it exists, just bump it to the top
+    if let Some(item) = existing {
+        sqlx::query(
+            "UPDATE items
+             SET bumped_at = CURRENT_TIMESTAMP,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?",
+        )
+        .bind(item.id)
+        .execute(&state.db)
+        .await
+        .map_err(|e| format!("Failed to bump existing item: {}", e))?;
+        return Ok(());
+    }
+
+    // otherwise, create a new item
     let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM items")
         .fetch_one(&state.db)
         .await
