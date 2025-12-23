@@ -118,7 +118,7 @@ const Home = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("components.home.searchPlaceholder")}
-          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
         />
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -129,7 +129,7 @@ const Home = () => {
                 key={idx}
                 ref={idx === selectedIndex ? selectedItemRef : null}
                 className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM} ${
-                  idx === selectedIndex ? "bg-blue-100" : ""
+                  idx === selectedIndex ? "bg-secondary/10" : ""
                 }`}
               >
                 <HighlightedText text={item.content} query={searchQuery} />
