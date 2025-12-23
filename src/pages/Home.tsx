@@ -8,8 +8,6 @@ import { useTranslation } from "react-i18next";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-// TODO ADICIONAR TESTE DO TECLADO
-
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
