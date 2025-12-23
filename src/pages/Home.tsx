@@ -8,11 +8,13 @@ import { useTranslation } from "react-i18next";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
+// TODO ADICIONAR TESTE DO TECLADO
+
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedItemRef = useRef<HTMLLIElement>(null);
   const clipboardText = useClipboardEventWatcher();
@@ -35,15 +37,21 @@ const Home = () => {
         e.preventDefault();
         setSelectedIndex((prev) => {
           if (e.key === "ArrowDown") {
-            return Math.min(prev + 1, filteredItems.length - 1);
+            return prev === null
+              ? 0
+              : Math.min(prev + 1, filteredItems.length - 1);
           } else {
-            return Math.max(prev - 1, 0);
+            return prev === null ? null : prev === 0 ? null : prev - 1;
           }
         });
         return;
       }
 
-      if (e.key === "Enter" && filteredItems.length > 0) {
+      if (
+        e.key === "Enter" &&
+        filteredItems.length > 0 &&
+        selectedIndex !== null
+      ) {
         e.preventDefault();
         const selectedItem = filteredItems[selectedIndex];
         if (selectedItem) {
