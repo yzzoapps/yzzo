@@ -1,13 +1,32 @@
 import { test, expect, describe, beforeEach, mock } from "bun:test";
-import { render, waitFor, within } from "@yzzo/test/utils/test-utils";
+import {
+  render,
+  waitFor,
+  within,
+  fireEvent,
+} from "@yzzo/test/utils/test-utils";
 import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
 import Home from "@yzzo/pages/Home";
 import { Item } from "@yzzo/models/Item";
 
 const mockGetItems = mock(() => Promise.resolve<Item[]>([]));
+const mockBumpItem = mock(() => Promise.resolve());
+const mockWriteText = mock(() => Promise.resolve());
+const mockMinimize = mock(() => Promise.resolve());
 
 mock.module("@yzzo/api/tauriApi", () => ({
   getItems: mockGetItems,
+  bumpItem: mockBumpItem,
+}));
+
+mock.module("@tauri-apps/plugin-clipboard-manager", () => ({
+  writeText: mockWriteText,
+}));
+
+mock.module("@tauri-apps/api/window", () => ({
+  getCurrentWindow: () => ({
+    minimize: mockMinimize,
+  }),
 }));
 
 mock.module("@yzzo/hooks/useClipboardWatcher", () => ({
@@ -271,6 +290,358 @@ describe("Home page", () => {
           within(container).getByText("Primeiro item"),
         ).toBeInTheDocument();
         expect(within(container).getByText("Segundo item")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Keyboard navigation", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+      mockGetItems.mockClear();
+      mockBumpItem.mockClear();
+      mockWriteText.mockClear();
+      mockMinimize.mockClear();
+    });
+
+    test("should not have any item selected initially", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        listItems.forEach((item) => {
+          expect(item).not.toHaveClass("bg-secondary/10");
+        });
+      });
+    });
+
+    test("should select first item when pressing ArrowDown from no selection", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+        expect(listItems[1]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[2]).not.toHaveClass("bg-secondary/10");
+      });
+    });
+
+    test("should navigate down through items with ArrowDown", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      // select first item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // move to second item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      // move to third item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[2]).toHaveClass("bg-secondary/10");
+      });
+    });
+
+    test("should not move past the last item when pressing ArrowDown", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      // Navigate to last item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      // Try to go past last item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        // Should still be on last item
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+    });
+
+    test("should navigate up with ArrowUp and deselect when reaching first item", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      // Navigate to third item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[2]).toHaveClass("bg-secondary/10");
+      });
+
+      // Navigate back up to second item
+      fireEvent.keyDown(window, { key: "ArrowUp" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+        expect(listItems[2]).not.toHaveClass("bg-secondary/10");
+      });
+
+      // Navigate to first item
+      fireEvent.keyDown(window, { key: "ArrowUp" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+        expect(listItems[1]).not.toHaveClass("bg-secondary/10");
+      });
+
+      // Navigate up from first item - should deselect
+      fireEvent.keyDown(window, { key: "ArrowUp" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        listItems.forEach((item) => {
+          expect(item).not.toHaveClass("bg-secondary/10");
+        });
+      });
+    });
+
+    test("should do nothing when pressing ArrowUp from no selection", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      fireEvent.keyDown(window, { key: "ArrowUp" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        listItems.forEach((item) => {
+          expect(item).not.toHaveClass("bg-secondary/10");
+        });
+      });
+    });
+
+    test("should not trigger Enter action when no item is selected", async () => {
+      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      fireEvent.keyDown(window, { key: "Enter" });
+
+      await waitFor(() => {
+        expect(mockBumpItem).not.toHaveBeenCalled();
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockMinimize).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should copy to clipboard, bump item, and minimize window when Enter is pressed on selected item", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      // Select second item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      fireEvent.keyDown(window, { key: "Enter" });
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
+        expect(mockWriteText).toHaveBeenCalledWith("Second item");
+        expect(mockMinimize).toHaveBeenCalled();
+      });
+    });
+
+    test("should focus search input when typing regular characters", async () => {
+      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      const searchInput = (await waitFor(() =>
+        within(container).getByRole("textbox"),
+      )) as HTMLInputElement;
+
+      expect(document.activeElement).not.toBe(searchInput);
+
+      fireEvent.keyDown(window, { key: "a" });
+
+      await waitFor(() => {
+        expect(document.activeElement).toBe(searchInput);
+        expect(searchInput.value).toBe("a");
+      });
+    });
+
+    test("should not interfere with typing when search input is already focused", async () => {
+      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      const searchInput = (await waitFor(() =>
+        within(container).getByRole("textbox"),
+      )) as HTMLInputElement;
+
+      searchInput.focus();
+
+      fireEvent.change(searchInput, { target: { value: "test" } });
+
+      await waitFor(() => {
+        expect(searchInput.value).toBe("test");
+      });
+    });
+
+    test("should ignore keyboard shortcuts with modifier keys (Ctrl, Alt, Meta)", async () => {
+      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      const searchInput = await waitFor(() =>
+        within(container).getByRole("textbox"),
+      );
+
+      expect(document.activeElement).not.toBe(searchInput);
+
+      // Try with Ctrl
+      fireEvent.keyDown(window, { key: "a", ctrlKey: true });
+      expect(document.activeElement).not.toBe(searchInput);
+
+      // Try with Alt
+      fireEvent.keyDown(window, { key: "a", altKey: true });
+      expect(document.activeElement).not.toBe(searchInput);
+
+      // Try with Meta
+      fireEvent.keyDown(window, { key: "a", metaKey: true });
+      expect(document.activeElement).not.toBe(searchInput);
+    });
+
+    test("should maintain selection when items are filtered", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "Apple" },
+        { id: 2, content: "Banana" },
+        { id: 3, content: "Cherry" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Apple")).toBeInTheDocument();
+      });
+
+      // select second item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      // filter items
+      const searchInput = within(container).getByRole(
+        "textbox",
+      ) as HTMLInputElement;
+      fireEvent.change(searchInput, { target: { value: "a" } });
+
+      await waitFor(() => {
+        // after filtering, the second item (index 1) in the filtered list should still be selected
+        // this will be "Banana" which is at index 1 in the filtered results
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
       });
     });
   });
