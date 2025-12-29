@@ -333,6 +333,8 @@ describe("Home page", () => {
 
       await waitFor(() => {
         expect(within(container).getByText("First item")).toBeInTheDocument();
+        expect(within(container).getByText("Second item")).toBeInTheDocument();
+        expect(within(container).getByText("Third item")).toBeInTheDocument();
       });
 
       fireEvent.keyDown(window, { key: "ArrowDown" });
@@ -642,6 +644,104 @@ describe("Home page", () => {
         // this will be "Banana" which is at index 1 in the filtered results
         const listItems = within(container).getAllByRole("listitem");
         expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+    });
+  });
+
+  describe("Mouse interactions", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+      mockGetItems.mockClear();
+      mockBumpItem.mockClear();
+      mockWriteText.mockClear();
+      mockMinimize.mockClear();
+    });
+
+    test("should select item when clicked", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+        expect(within(container).getByText("Second item")).toBeInTheDocument();
+        expect(within(container).getByText("Third item")).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // click on second item
+      fireEvent.click(listItems[1]);
+
+      await waitFor(() => {
+        expect(listItems[0]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+        expect(listItems[2]).not.toHaveClass("bg-secondary/10");
+      });
+    });
+
+    test("should copy to clipboard, bump item, and minimize window when item is double-clicked", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+        expect(within(container).getByText("Second item")).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // double click on second item
+      fireEvent.doubleClick(listItems[1]);
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
+        expect(mockWriteText).toHaveBeenCalledWith("Second item");
+        expect(mockMinimize).toHaveBeenCalled();
+      });
+    });
+
+    test("should allow clicking different items to change selection", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item" },
+        { id: 2, content: "Second item" },
+        { id: 3, content: "Third item" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+        expect(within(container).getByText("Second item")).toBeInTheDocument();
+        expect(within(container).getByText("Third item")).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // click on first item
+      fireEvent.click(listItems[0]);
+
+      await waitFor(() => {
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // click on third item
+      fireEvent.click(listItems[2]);
+
+      await waitFor(() => {
+        expect(listItems[0]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[2]).toHaveClass("bg-secondary/10");
       });
     });
   });
