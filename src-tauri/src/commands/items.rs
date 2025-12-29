@@ -13,14 +13,39 @@ pub async fn add_item(
 ) -> Result<(), String> {
     let item_type = item_type.unwrap_or_else(|| "text".to_string());
 
-    // check if an item with the same content already exists - for images, check by file_path. for text, check by content
+    // check if an item with the same content already exists
     let existing: Option<Item> = if item_type == "image" {
-        if let Some(ref path) = file_path {
-            sqlx::query_as::<_, Item>("SELECT * FROM items WHERE file_path = ?")
-                .bind(path)
-                .fetch_optional(&state.db)
-                .await
-                .map_err(|e| e.to_string())?
+        // for images, check by hash in metadata (best deduplication)
+        if let Some(ref meta) = metadata {
+            if let Ok(meta_json) = serde_json::from_str::<serde_json::Value>(meta) {
+                if let Some(hash) = meta_json.get("hash").and_then(|h| h.as_str()) {
+                    // check all image items for matching hash in metadata
+                    let all_images: Vec<Item> =
+                        sqlx::query_as::<_, Item>("SELECT * FROM items WHERE item_type = 'image'")
+                            .fetch_all(&state.db)
+                            .await
+                            .map_err(|e| e.to_string())?;
+
+                    all_images.into_iter().find(|item| {
+                        if let Some(ref item_meta) = item.metadata {
+                            if let Ok(item_meta_json) =
+                                serde_json::from_str::<serde_json::Value>(item_meta)
+                            {
+                                if let Some(item_hash) =
+                                    item_meta_json.get("hash").and_then(|h| h.as_str())
+                                {
+                                    return item_hash == hash;
+                                }
+                            }
+                        }
+                        false
+                    })
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -53,8 +78,28 @@ pub async fn add_item(
         .await
         .map_err(|e| e.to_string())?;
 
-    if count.0 >= 100 {
-        return Err("Maximum number of items (100) reached".into());
+    // auto-cleanup: if we're at the limit, delete the oldest item
+    const MAX_ITEMS: i64 = 200;
+    if count.0 >= MAX_ITEMS {
+        let oldest: Option<Item> =
+            sqlx::query_as::<_, Item>("SELECT * FROM items ORDER BY bumped_at ASC LIMIT 1")
+                .fetch_optional(&state.db)
+                .await
+                .map_err(|e| e.to_string())?;
+
+        if let Some(old_item) = oldest {
+            if old_item.item_type == "image" {
+                if let Some(ref path) = old_item.file_path {
+                    let _ = std::fs::remove_file(path);
+                }
+            }
+
+            sqlx::query("DELETE FROM items WHERE id = ?")
+                .bind(old_item.id)
+                .execute(&state.db)
+                .await
+                .map_err(|e| format!("Failed to delete oldest item: {}", e))?;
+        }
     }
 
     sqlx::query(
