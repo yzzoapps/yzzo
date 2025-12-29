@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
+// TODO: adicionar imagens
+
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
@@ -23,7 +25,7 @@ const Home = () => {
 
   useEffect(() => {
     selectedItemRef.current?.scrollIntoView({
-      behavior: "smooth",
+      behavior: "instant",
       block: "nearest",
     });
   }, [selectedIndex]);
@@ -126,9 +128,23 @@ const Home = () => {
               <li
                 key={idx}
                 ref={idx === selectedIndex ? selectedItemRef : null}
+                onClick={() => setSelectedIndex(idx)}
+                onDoubleClick={async () => {
+                  await bumpItem(item.id);
+                  await writeText(item.content);
+
+                  setSearchQuery("");
+                  searchInputRef.current?.blur();
+
+                  try {
+                    await getCurrentWindow().minimize();
+                  } catch (error) {
+                    console.error("Failed to hide window:", error);
+                  }
+                }}
                 className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM} ${
                   idx === selectedIndex ? "bg-secondary/10" : ""
-                }`}
+                } cursor-pointer`}
               >
                 <HighlightedText text={item.content} query={searchQuery} />
               </li>
