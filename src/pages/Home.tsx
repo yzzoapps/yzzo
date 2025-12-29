@@ -1,5 +1,6 @@
-import { getItems, bumpItem } from "@yzzo/api/tauriApi";
+import { getItems, bumpItem, writeImageToClipboard } from "@yzzo/api/tauriApi";
 import { Header, HighlightedText } from "@yzzo/components";
+import ImagePreview from "@yzzo/components/home/ImagePreview";
 import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 import { Item } from "@yzzo/models/Item";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
@@ -19,9 +20,13 @@ const Home = () => {
   const selectedItemRef = useRef<HTMLLIElement>(null);
   const clipboardText = useClipboardEventWatcher();
 
-  const filteredItems = items.filter((item) =>
-    item.content.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredItems = items.filter((item) => {
+    // Only search text items
+    if (item.item_type === "image") {
+      return searchQuery === ""; // Show images only when no search query
+    }
+    return item.content.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   useEffect(() => {
     selectedItemRef.current?.scrollIntoView({
@@ -56,7 +61,12 @@ const Home = () => {
         const selectedItem = filteredItems[selectedIndex];
         if (selectedItem) {
           await bumpItem(selectedItem.id);
-          await writeText(selectedItem.content);
+
+          if (selectedItem.item_type === "image" && selectedItem.file_path) {
+            await writeImageToClipboard(selectedItem.file_path);
+          } else {
+            await writeText(selectedItem.content);
+          }
 
           setSearchQuery("");
           searchInputRef.current?.blur();
@@ -131,7 +141,12 @@ const Home = () => {
                 onClick={() => setSelectedIndex(idx)}
                 onDoubleClick={async () => {
                   await bumpItem(item.id);
-                  await writeText(item.content);
+
+                  if (item.item_type === "image" && item.file_path) {
+                    await writeImageToClipboard(item.file_path);
+                  } else {
+                    await writeText(item.content);
+                  }
 
                   setSearchQuery("");
                   searchInputRef.current?.blur();
@@ -146,7 +161,16 @@ const Home = () => {
                   idx === selectedIndex ? "bg-secondary/10" : ""
                 } cursor-pointer`}
               >
-                <HighlightedText text={item.content} query={searchQuery} />
+                {item.item_type === "image" && item.file_path ? (
+                  <div className="flex items-center gap-3">
+                    <ImagePreview filePath={item.file_path} />
+                    <span className="text-xs text-gray-500">
+                      {item.content}
+                    </span>
+                  </div>
+                ) : (
+                  <HighlightedText text={item.content} query={searchQuery} />
+                )}
               </li>
             ))
           ) : (
