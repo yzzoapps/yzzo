@@ -1,22 +1,98 @@
 use arboard::Clipboard;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Wry};
+use tauri::{AppHandle, Emitter, Manager, Wry};
 
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
     let last_text = Arc::new(Mutex::new(String::new()));
     let last_text_clone = last_text.clone();
+    let last_image_hash = Arc::new(Mutex::new(0u64));
+    let last_image_hash_clone = last_image_hash.clone();
 
     thread::spawn(move || {
         let mut clipboard = Clipboard::new().unwrap();
 
         loop {
-            if let Ok(text) = clipboard.get_text() {
+            // Try to get image first (higher priority)
+            if let Ok(image) = clipboard.get_image() {
+                // Calculate hash of image data to detect duplicates
+                let mut hasher = DefaultHasher::new();
+                image.bytes.hash(&mut hasher);
+                image.width.hash(&mut hasher);
+                image.height.hash(&mut hasher);
+                let current_hash = hasher.finish();
+
+                let mut last_hash = last_image_hash_clone.lock().unwrap();
+
+                // Only process if this is a new/different image
+                if *last_hash != current_hash {
+                    *last_hash = current_hash;
+                    let app_data_dir = app_handle
+                        .path()
+                        .app_data_dir()
+                        .expect("failed to get app data directory");
+
+                    let images_dir = app_data_dir.join("images");
+                    std::fs::create_dir_all(&images_dir)
+                        .expect("failed to create images directory");
+
+                    // generate unique filename using timestamp and hash
+                    let timestamp = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_millis();
+                    let filename = format!("{}.png", timestamp);
+                    let file_path = images_dir.join(&filename);
+
+                    // convert ImageData to image crate format and save
+                    let img_buffer = image::RgbaImage::from_raw(
+                        image.width as u32,
+                        image.height as u32,
+                        image.bytes.into_owned(),
+                    );
+
+                    if let Some(img) = img_buffer {
+                        if img.save(&file_path).is_ok() {
+                            let metadata = serde_json::json!({
+                                "width": image.width,
+                                "height": image.height,
+                                "format": "png",
+                                "size": std::fs::metadata(&file_path).map(|m| m.len()).unwrap_or(0)
+                            });
+
+                            let _ = app_handle.emit(
+                                "clipboard-changed",
+                                serde_json::json!({
+                                    "type": "image",
+                                    "content": filename,
+                                    "file_path": file_path.to_str().unwrap(),
+                                    "metadata": metadata.to_string()
+                                }),
+                            );
+
+                            // clear last text so we don't emit duplicate on next text
+                            let mut last = last_text_clone.lock().unwrap();
+                            *last = String::new();
+                        }
+                    }
+                }
+            } else if let Ok(text) = clipboard.get_text() {
+                // clear image hash when text is detected
+                let mut last_hash = last_image_hash_clone.lock().unwrap();
+                *last_hash = 0;
                 let mut last = last_text_clone.lock().unwrap();
                 if *last != text {
                     *last = text.clone();
-                    app_handle.emit("clipboard-changed", text).unwrap();
+                    let _ = app_handle.emit(
+                        "clipboard-changed",
+                        serde_json::json!({
+                            "type": "text",
+                            "content": text
+                        }),
+                    );
                 }
             }
             thread::sleep(Duration::from_millis(200));

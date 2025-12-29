@@ -166,6 +166,7 @@ describe("Home page", () => {
         {
           id: 1,
           content: "Hello world",
+          item_type: "text",
         },
       ];
 
@@ -190,6 +191,7 @@ describe("Home page", () => {
         {
           id: 1,
           content: "Test item",
+          item_type: "text",
         },
       ];
 
@@ -206,10 +208,12 @@ describe("Home page", () => {
         {
           id: 1,
           content: "First item",
+          item_type: "text",
         },
         {
           id: 2,
           content: "Second item",
+          item_type: "text",
         },
       ];
 
@@ -257,6 +261,7 @@ describe("Home page", () => {
         {
           id: 1,
           content: "Item de teste",
+          item_type: "text",
         },
       ];
 
@@ -275,10 +280,12 @@ describe("Home page", () => {
         {
           id: 1,
           content: "Primeiro item",
+          item_type: "text",
         },
         {
           id: 2,
           content: "Segundo item",
+          item_type: "text",
         },
       ];
 
@@ -305,9 +312,9 @@ describe("Home page", () => {
 
     test("should not have any item selected initially", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -323,9 +330,9 @@ describe("Home page", () => {
 
     test("should select first item when pressing ArrowDown from no selection", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -349,9 +356,9 @@ describe("Home page", () => {
 
     test("should navigate down through items with ArrowDown", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -390,8 +397,8 @@ describe("Home page", () => {
 
     test("should not move past the last item when pressing ArrowDown", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -422,9 +429,9 @@ describe("Home page", () => {
 
     test("should navigate up with ArrowUp and deselect when reaching first item", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -475,8 +482,8 @@ describe("Home page", () => {
 
     test("should do nothing when pressing ArrowUp from no selection", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -497,7 +504,7 @@ describe("Home page", () => {
     });
 
     test("should not trigger Enter action when no item is selected", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -517,8 +524,8 @@ describe("Home page", () => {
 
     test("should copy to clipboard, bump item, and minimize window when Enter is pressed on selected item", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -547,7 +554,7 @@ describe("Home page", () => {
     });
 
     test("should focus search input when typing regular characters", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -567,7 +574,7 @@ describe("Home page", () => {
     });
 
     test("should not interfere with typing when search input is already focused", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -586,7 +593,7 @@ describe("Home page", () => {
     });
 
     test("should ignore keyboard shortcuts with modifier keys (Ctrl, Alt, Meta)", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item" }];
+      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -612,9 +619,9 @@ describe("Home page", () => {
 
     test("should maintain selection when items are filtered", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "Apple" },
-        { id: 2, content: "Banana" },
-        { id: 3, content: "Cherry" },
+        { id: 1, content: "Apple", item_type: "text" },
+        { id: 2, content: "Banana", item_type: "text" },
+        { id: 3, content: "Cherry", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -659,9 +666,9 @@ describe("Home page", () => {
 
     test("should select item when clicked", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -687,8 +694,8 @@ describe("Home page", () => {
 
     test("should copy to clipboard, bump item, and minimize window when item is double-clicked", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
@@ -713,9 +720,9 @@ describe("Home page", () => {
 
     test("should allow clicking different items to change selection", async () => {
       const mockItems: Item[] = [
-        { id: 1, content: "First item" },
-        { id: 2, content: "Second item" },
-        { id: 3, content: "Third item" },
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
       ];
 
       mockGetItems.mockResolvedValue(mockItems);
