@@ -17,6 +17,7 @@ const mockMinimize = mock(() => Promise.resolve());
 mock.module("@yzzo/api/tauriApi", () => ({
   getItems: mockGetItems,
   bumpItem: mockBumpItem,
+  writeImageToClipboard: mock(() => Promise.resolve()),
 }));
 
 mock.module("@tauri-apps/plugin-clipboard-manager", () => ({
@@ -29,8 +30,16 @@ mock.module("@tauri-apps/api/window", () => ({
   }),
 }));
 
-mock.module("@yzzo/hooks/useClipboardWatcher", () => ({
-  useClipboardEventWatcher: () => null,
+mock.module("@tauri-apps/api/event", () => ({
+  listen: () => Promise.resolve(() => {}),
+}));
+
+mock.module("@yzzo/components/home/ImagePreview", () => ({
+  default: ({ filePath }: any) => (
+    <div data-testid="image-preview" data-file-path={filePath}>
+      ImagePreview
+    </div>
+  ),
 }));
 
 mock.module("@yzzo/components", () => ({
@@ -504,7 +513,9 @@ describe("Home page", () => {
     });
 
     test("should not trigger Enter action when no item is selected", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+      ];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -554,7 +565,9 @@ describe("Home page", () => {
     });
 
     test("should focus search input when typing regular characters", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+      ];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -574,7 +587,9 @@ describe("Home page", () => {
     });
 
     test("should not interfere with typing when search input is already focused", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+      ];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
@@ -593,7 +608,9 @@ describe("Home page", () => {
     });
 
     test("should ignore keyboard shortcuts with modifier keys (Ctrl, Alt, Meta)", async () => {
-      const mockItems: Item[] = [{ id: 1, content: "First item", item_type: "text" }];
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+      ];
 
       mockGetItems.mockResolvedValue(mockItems);
       const { container } = render(<Home />);
