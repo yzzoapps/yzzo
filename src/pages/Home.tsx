@@ -21,10 +21,11 @@ const Home = () => {
   const clipboardText = useClipboardEventWatcher();
 
   const filteredItems = items.filter((item) => {
-    // Only search text items
-    if (item.item_type === "image") {
-      return searchQuery === ""; // Show images only when no search query
+    if (searchQuery === "") {
+      return true; // show all items when no search query
     }
+
+    // Search both text and image items by their content (filename for images)
     return item.content.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
@@ -164,8 +165,14 @@ const Home = () => {
                 {item.item_type === "image" && item.file_path ? (
                   <div className="flex items-center gap-3">
                     <ImagePreview filePath={item.file_path} />
-                    <span className="text-xs text-gray-500">
-                      {item.content}
+                    <span
+                      className="text-xs text-gray-500"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      <HighlightedText
+                        text={item.content}
+                        query={searchQuery}
+                      />
                     </span>
                   </div>
                 ) : (

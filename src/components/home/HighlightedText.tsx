@@ -18,7 +18,7 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, query }) => {
             {part}
           </mark>
         ) : (
-          <span key={index}>{part}</span>
+          part
         ),
       )}
     </>
