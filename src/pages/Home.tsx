@@ -1,13 +1,13 @@
 import { getItems, bumpItem, writeImageToClipboard } from "@yzzo/api/tauriApi";
 import { Header, HighlightedText } from "@yzzo/components";
 import ImagePreview from "@yzzo/components/home/ImagePreview";
-import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
 import { Item } from "@yzzo/models/Item";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { listen } from "@tauri-apps/api/event";
 
 // TODO: adicionar imagens
 
@@ -18,7 +18,7 @@ const Home = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedItemRef = useRef<HTMLLIElement>(null);
-  const clipboardText = useClipboardEventWatcher();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const filteredItems = items.filter((item) => {
     if (searchQuery === "") {
@@ -112,12 +112,26 @@ const Home = () => {
     })();
   }, []);
 
+  // listen for clipboard changes to refresh items list
   useEffect(() => {
-    (async () => {
-      const updatedItems = await getItems();
-      setItems(updatedItems);
-    })();
-  }, [clipboardText]);
+    const unlisten = listen("clipboard-changed", () => {
+      setRefreshTrigger((prev) => prev + 1);
+    });
+
+    return () => {
+      unlisten.then((f) => f());
+    };
+  }, []);
+
+  // refresh items when clipboard changes
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      (async () => {
+        const updatedItems = await getItems();
+        setItems(updatedItems);
+      })();
+    }
+  }, [refreshTrigger]);
 
   return (
     <div className="flex flex-col h-screen">
