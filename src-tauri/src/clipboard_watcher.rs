@@ -16,23 +16,12 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
         let mut clipboard = Clipboard::new().unwrap();
 
         loop {
-            // try to get text first (higher priority - most common use case)
-            if let Ok(text) = clipboard.get_text() {
-                // clear image hash when text is detected
-                let mut last_hash = last_image_hash_clone.lock().unwrap();
-                *last_hash = 0;
-                let mut last = last_text_clone.lock().unwrap();
-                if *last != text {
-                    *last = text.clone();
-                    let _ = app_handle.emit(
-                        "clipboard-changed",
-                        serde_json::json!({
-                            "type": "text",
-                            "content": text
-                        }),
-                    );
-                }
-            } else if let Ok(image) = clipboard.get_image() {
+            // try to get image first to avoid reading clipboard multiple times
+            let image_result = clipboard.get_image();
+            let text_result = clipboard.get_text();
+
+            // prioritize image data over HTML text representing images
+            if let Ok(image) = image_result {
                 // calculate hash of image data to detect duplicates
                 let mut hasher = DefaultHasher::new();
                 image.bytes.hash(&mut hasher);
@@ -92,6 +81,29 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
                         // clear last text so we don't emit duplicate on next text
                         let mut last = last_text_clone.lock().unwrap();
                         *last = String::new();
+                    }
+                }
+            } else if let Ok(text) = text_result {
+                // no image data, process text
+                // but skip HTML content that represents images
+                let is_html_image = text.trim().starts_with("<meta")
+                    || text.trim().starts_with("<!DOCTYPE")
+                    || (text.contains("<img") && text.contains("src="));
+
+                if !is_html_image {
+                    // clear image hash when text is detected
+                    let mut last_hash = last_image_hash_clone.lock().unwrap();
+                    *last_hash = 0;
+                    let mut last = last_text_clone.lock().unwrap();
+                    if *last != text {
+                        *last = text.clone();
+                        let _ = app_handle.emit(
+                            "clipboard-changed",
+                            serde_json::json!({
+                                "type": "text",
+                                "content": text
+                            }),
+                        );
                     }
                 }
             }
