@@ -178,7 +178,7 @@ const Home = () => {
                   <div className="flex items-center gap-3">
                     <ImagePreview filePath={item.file_path} />
                     <span
-                      className="text-xs text-gray-500"
+                      className="text-xs text-gray-500 line-clamp-1"
                       style={{ whiteSpace: "nowrap" }}
                     >
                       <HighlightedText
@@ -188,7 +188,9 @@ const Home = () => {
                     </span>
                   </div>
                 ) : (
-                  <HighlightedText text={item.content} query={searchQuery} />
+                  <div className="line-clamp-10">
+                    <HighlightedText text={item.content} query={searchQuery} />
+                  </div>
                 )}
               </li>
             ))
