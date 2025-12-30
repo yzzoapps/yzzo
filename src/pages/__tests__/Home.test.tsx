@@ -13,11 +13,12 @@ const mockGetItems = mock(() => Promise.resolve<Item[]>([]));
 const mockBumpItem = mock(() => Promise.resolve());
 const mockWriteText = mock(() => Promise.resolve());
 const mockMinimize = mock(() => Promise.resolve());
+const mockWriteImageToClipboard = mock(() => Promise.resolve());
 
 mock.module("@yzzo/api/tauriApi", () => ({
   getItems: mockGetItems,
   bumpItem: mockBumpItem,
-  writeImageToClipboard: mock(() => Promise.resolve()),
+  writeImageToClipboard: mockWriteImageToClipboard,
 }));
 
 mock.module("@tauri-apps/plugin-clipboard-manager", () => ({
@@ -766,6 +767,454 @@ describe("Home page", () => {
       await waitFor(() => {
         expect(listItems[0]).not.toHaveClass("bg-secondary/10");
         expect(listItems[2]).toHaveClass("bg-secondary/10");
+      });
+    });
+  });
+
+  describe("Image clipboard behavior", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+      mockGetItems.mockClear();
+      mockBumpItem.mockClear();
+      mockWriteText.mockClear();
+      mockWriteImageToClipboard.mockClear();
+      mockMinimize.mockClear();
+    });
+
+    test("should render image items with ImagePreview component", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        const imagePreview = within(container).getByTestId("image-preview");
+        expect(imagePreview).toBeInTheDocument();
+        expect(imagePreview).toHaveAttribute(
+          "data-file-path",
+          "/path/to/screenshot.png",
+        );
+      });
+    });
+
+    test("should render multiple image items", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot1.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot1.png",
+        },
+        {
+          id: 2,
+          content: "screenshot2.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot2.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        const imagePreviews = within(container).getAllByTestId("image-preview");
+        expect(imagePreviews).toHaveLength(2);
+        expect(imagePreviews[0]).toHaveAttribute(
+          "data-file-path",
+          "/path/to/screenshot1.png",
+        );
+        expect(imagePreviews[1]).toHaveAttribute(
+          "data-file-path",
+          "/path/to/screenshot2.png",
+        );
+      });
+    });
+
+    test("should render mixed text and image items", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "Text item",
+          item_type: "text",
+        },
+        {
+          id: 2,
+          content: "image.png",
+          item_type: "image",
+          file_path: "/path/to/image.png",
+        },
+        {
+          id: 3,
+          content: "Another text item",
+          item_type: "text",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Text item")).toBeInTheDocument();
+        const imagePreview = within(container).getByTestId("image-preview");
+        expect(imagePreview).toBeInTheDocument();
+        expect(
+          within(container).getByText("Another text item"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test("should call writeImageToClipboard when Enter is pressed on selected image item", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+      });
+
+      // Select the image item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // Press Enter
+      fireEvent.keyDown(window, { key: "Enter" });
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/screenshot.png",
+        );
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+        expect(mockMinimize).toHaveBeenCalled();
+      });
+    });
+
+    test("should call writeImageToClipboard when double-clicking an image item", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // Double click the image item
+      fireEvent.doubleClick(listItems[0]);
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/screenshot.png",
+        );
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+        expect(mockMinimize).toHaveBeenCalled();
+      });
+    });
+
+    test("should use writeText for text items and writeImageToClipboard for image items", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "Text item",
+          item_type: "text",
+        },
+        {
+          id: 2,
+          content: "image.png",
+          item_type: "image",
+          file_path: "/path/to/image.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Text item")).toBeInTheDocument();
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // Test text item
+      fireEvent.doubleClick(listItems[0]);
+
+      await waitFor(() => {
+        expect(mockWriteText).toHaveBeenCalledWith("Text item");
+        expect(mockWriteImageToClipboard).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+      });
+
+      // Clear mocks
+      mockWriteText.mockClear();
+      mockWriteImageToClipboard.mockClear();
+      mockBumpItem.mockClear();
+
+      // Test image item
+      fireEvent.doubleClick(listItems[1]);
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/image.png",
+        );
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
+      });
+    });
+
+    test("should navigate and select image items with keyboard", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "image1.png",
+          item_type: "image",
+          file_path: "/path/to/image1.png",
+        },
+        {
+          id: 2,
+          content: "image2.png",
+          item_type: "image",
+          file_path: "/path/to/image2.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        const imagePreviews = within(container).getAllByTestId("image-preview");
+        expect(imagePreviews).toHaveLength(2);
+      });
+
+      // Navigate to first image
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // Navigate to second image
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).not.toHaveClass("bg-secondary/10");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      // Press Enter on second image
+      fireEvent.keyDown(window, { key: "Enter" });
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/image2.png",
+        );
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
+      });
+    });
+
+    test("should filter image items by filename", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "apple.png",
+          item_type: "image",
+          file_path: "/path/to/apple.png",
+        },
+        {
+          id: 2,
+          content: "banana.png",
+          item_type: "image",
+          file_path: "/path/to/banana.png",
+        },
+        {
+          id: 3,
+          content: "cherry.png",
+          item_type: "image",
+          file_path: "/path/to/cherry.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        const imagePreviews = within(container).getAllByTestId("image-preview");
+        expect(imagePreviews).toHaveLength(3);
+      });
+
+      // Verify all images are rendered and filenames are searchable
+      expect(within(container).getByText("apple.png")).toBeInTheDocument();
+      expect(within(container).getByText("banana.png")).toBeInTheDocument();
+      expect(within(container).getByText("cherry.png")).toBeInTheDocument();
+    });
+
+    test("should handle image items without file_path gracefully", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "broken-image.png",
+          item_type: "image",
+          // Missing file_path
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        // Should render the filename as text since file_path is missing
+        expect(
+          within(container).getByText("broken-image.png"),
+        ).toBeInTheDocument();
+        // Should not render image preview
+        expect(
+          within(container).queryByTestId("image-preview"),
+        ).not.toBeInTheDocument();
+      });
+
+      // Double click should not call writeImageToClipboard
+      const listItems = within(container).getAllByRole("listitem");
+      fireEvent.doubleClick(listItems[0]);
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).not.toHaveBeenCalled();
+        expect(mockWriteText).toHaveBeenCalledWith("broken-image.png");
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+      });
+    });
+
+    test("should display filename alongside image preview", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "my-screenshot.png",
+          item_type: "image",
+          file_path: "/path/to/my-screenshot.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+        expect(
+          within(container).getByText("my-screenshot.png"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test("should highlight filename in search results for image items", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot-2025.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot-2025.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+      });
+
+      // Verify the filename is displayed alongside the image
+      expect(
+        within(container).getByText("screenshot-2025.png"),
+      ).toBeInTheDocument();
+    });
+
+    test("should copy correct item type when selecting mixed text and image items", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "Text item 1",
+          item_type: "text",
+        },
+        {
+          id: 2,
+          content: "image1.png",
+          item_type: "image",
+          file_path: "/path/to/image1.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Text item 1")).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // Test double-clicking text item
+      fireEvent.doubleClick(listItems[0]);
+
+      await waitFor(() => {
+        expect(mockWriteText).toHaveBeenCalledWith("Text item 1");
+        expect(mockWriteImageToClipboard).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+      });
+
+      // Clear mocks
+      mockWriteText.mockClear();
+      mockWriteImageToClipboard.mockClear();
+      mockBumpItem.mockClear();
+
+      // Test double-clicking image item
+      fireEvent.doubleClick(listItems[1]);
+
+      await waitFor(() => {
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/image1.png",
+        );
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
       });
     });
   });

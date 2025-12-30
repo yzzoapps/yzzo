@@ -9,8 +9,6 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 
-// TODO: adicionar teste das imagens
-
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
