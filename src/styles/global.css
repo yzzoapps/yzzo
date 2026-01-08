@@ -15,3 +15,13 @@
   --color-neutral-white: #f5f5f5;
   --color-neutral-black: #111111;
 }
+
+@keyframes progressPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}

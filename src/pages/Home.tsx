@@ -17,7 +17,7 @@ const Home = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedItemRef = useRef<HTMLLIElement>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const filteredItems = items.filter((item) => {
     if (searchQuery === "") {
@@ -106,10 +106,9 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
       const existingItems = await getItems();
       setItems(existingItems);
-      setIsLoading(false);
+      setHasLoaded(true);
     })();
   }, []);
 
@@ -147,16 +146,21 @@ const Home = () => {
           className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
         />
       </div>
+      <div
+        className={`h-1 w-full overflow-hidden relative ${!hasLoaded ? "bg-gray-200" : "bg-transparent"}`}
+      >
+        {!hasLoaded && (
+          <div
+            className="h-full bg-secondary absolute inset-0"
+            style={{
+              animation: "progressPulse 1.5s ease-in-out infinite",
+            }}
+          ></div>
+        )}
+      </div>
       <div className="flex-1 overflow-y-auto">
         <ul className="w-full">
-          {isLoading ? (
-            <li className="py-8 px-4 text-center text-sm text-gray-500">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-secondary rounded-full animate-spin" />
-                <span>{t("components.home.loading")}</span>
-              </div>
-            </li>
-          ) : filteredItems.length > 0 ? (
+          {filteredItems.length > 0 ? (
             filteredItems.map((item, idx) => (
               <li
                 key={idx}
@@ -204,13 +208,13 @@ const Home = () => {
                 )}
               </li>
             ))
-          ) : (
+          ) : hasLoaded ? (
             <li className="py-8 px-4 text-center text-sm text-gray-500">
               {searchQuery
                 ? t("components.home.noResults")
                 : t("components.home.noItems")}
             </li>
-          )}
+          ) : null}
         </ul>
       </div>
     </div>
