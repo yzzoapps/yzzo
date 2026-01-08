@@ -17,6 +17,7 @@ const Home = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedItemRef = useRef<HTMLLIElement>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const filteredItems = items.filter((item) => {
     if (searchQuery === "") {
@@ -105,8 +106,10 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
+      setIsLoading(true);
       const existingItems = await getItems();
       setItems(existingItems);
+      setIsLoading(false);
     })();
   }, []);
 
@@ -146,7 +149,14 @@ const Home = () => {
       </div>
       <div className="flex-1 overflow-y-auto">
         <ul className="w-full">
-          {filteredItems.length > 0 ? (
+          {isLoading ? (
+            <li className="py-8 px-4 text-center text-sm text-gray-500">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-secondary rounded-full animate-spin" />
+                <span>{t("components.home.loading")}</span>
+              </div>
+            </li>
+          ) : filteredItems.length > 0 ? (
             filteredItems.map((item, idx) => (
               <li
                 key={idx}

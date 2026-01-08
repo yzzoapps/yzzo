@@ -2,7 +2,8 @@
   "home": {
     "searchPlaceholder": "Type to search...",
     "noResults": "No results found",
-    "noItems": "No items yet"
+    "noItems": "Your clipboard history will show up here. Copy text or images to see it appear!",
+    "loading": "Loading..."
   },
   "settings": {
     "hotkey": {
