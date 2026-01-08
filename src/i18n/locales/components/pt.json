@@ -2,7 +2,8 @@
   "home": {
     "searchPlaceholder": "Digite para pesquisar...",
     "noResults": "Nenhum resultado encontrado",
-    "noItems": "Nenhum item ainda"
+    "noItems": "O histórico da sua área de transferência aparecerá aqui. Copie textos ou imagens para vê-lo aparecer!",
+    "loading": "Carregando..."
   },
   "settings": {
     "hotkey": {
