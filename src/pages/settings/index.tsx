@@ -1,4 +1,4 @@
-import { Header, SettingsItem } from "@yzzo/components";
+import { Button, Header, SettingsItem } from "@yzzo/components";
 import { clearAllItems } from "@yzzo/api/tauriApi";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useTranslation } from "react-i18next";
@@ -24,13 +24,12 @@ const Settings = () => {
         <SettingsItem name={t("common.settings.privacy")} route={"/"} />
         <SettingsItem name={t("common.settings.about")} route={"/"} />
       </ul>
-      <div className={`px-4 py-4 ${BORDER_BOTTOM}`}>
-        <button
+      <div className={`px-4 py-4 ${BORDER_BOTTOM} items-center flex`}>
+        <Button
+          variant="danger"
           onClick={handleClearHistory}
-          className="w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium transition-colors"
-        >
-          {t("common.settings.clearHistory")}
-        </button>
+          label={t("common.settings.clearHistory")}
+        />
       </div>
     </>
   );
