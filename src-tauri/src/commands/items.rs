@@ -79,7 +79,7 @@ pub async fn add_item(
         .map_err(|e| e.to_string())?;
 
     // auto-cleanup: if we're at the limit, delete the oldest item
-    const MAX_ITEMS: i64 = 200;
+    const MAX_ITEMS: i64 = 100;
     if count.0 >= MAX_ITEMS {
         let oldest: Option<Item> =
             sqlx::query_as::<_, Item>("SELECT * FROM items ORDER BY bumped_at ASC LIMIT 1")
