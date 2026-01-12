@@ -1,7 +1,7 @@
 {
   "home": {
     "searchPlaceholder": "Type to search...",
-    "noResults": "No results found.",
+    "noResults": "No items found.",
     "noItems": "Your clipboard history will show up here. Copy text or images to see it appear!",
     "loading": "Loading..."
   },

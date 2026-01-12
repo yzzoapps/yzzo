@@ -167,7 +167,11 @@ describe("Home page", () => {
       const { container } = render(<Home />);
 
       await waitFor(() => {
-        expect(within(container).getByText("No items yet")).toBeInTheDocument();
+        expect(
+          within(container).getByText(
+            "Your clipboard history will show up here. Copy text or images to see it appear!",
+          ),
+        ).toBeInTheDocument();
       });
     });
 
@@ -261,7 +265,9 @@ describe("Home page", () => {
 
       await waitFor(() => {
         expect(
-          within(container).getByText("Nenhum item ainda"),
+          within(container).getByText(
+            "O histórico da sua área de transferência aparecerá aqui. Copie textos ou imagens para vê-lo aparecer!",
+          ),
         ).toBeInTheDocument();
       });
     });

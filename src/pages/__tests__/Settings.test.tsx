@@ -1,8 +1,9 @@
-import { test, expect, describe, beforeEach, mock } from "bun:test";
-import { waitFor, within } from "@testing-library/react";
+import { test, expect, describe, beforeEach, mock, spyOn } from "bun:test";
+import { waitFor, within, fireEvent } from "@testing-library/react";
 import { render } from "@yzzo/test/utils/test-utils";
 import { setupI18nMock, hasTranslationKey } from "@yzzo/test/utils/i18n-mock";
 import Settings from "@yzzo/pages/settings";
+import * as tauriApi from "@yzzo/api/tauriApi";
 
 mock.module("@yzzo/components", () => ({
   Header: ({ title, previousRoute, type = "secondary" }: any) => (
@@ -18,6 +19,10 @@ mock.module("@yzzo/components", () => ({
       {name}
     </a>
   ),
+}));
+
+mock.module("@yzzo/api/tauriApi", () => ({
+  clearAllItems: mock(() => Promise.resolve()),
 }));
 
 describe("Home page", () => {
@@ -55,6 +60,8 @@ describe("Home page", () => {
           "common.settings.preferences",
           "common.settings.privacy",
           "common.settings.about",
+          "common.settings.clearHistory",
+          "common.settings.clearHistoryConfirm",
         ];
 
         keysToCheck.forEach((key) => {
@@ -69,6 +76,8 @@ describe("Home page", () => {
           "common.settings.preferences",
           "common.settings.privacy",
           "common.settings.about",
+          "common.settings.clearHistory",
+          "common.settings.clearHistoryConfirm",
         ];
 
         keysToCheck.forEach((key) => {
@@ -87,6 +96,18 @@ describe("Home page", () => {
         expect(within(container).getByText("Preferences")).toBeInTheDocument();
         expect(within(container).getByText("Privacy")).toBeInTheDocument();
         expect(within(container).getByText("About")).toBeInTheDocument();
+      });
+    });
+
+    test("should render clear history button", async () => {
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText(
+          "Clear clipboard history",
+        );
+        expect(clearButton).toBeInTheDocument();
+        expect(clearButton.tagName).toBe("BUTTON");
       });
     });
 
@@ -204,6 +225,92 @@ describe("Home page", () => {
         const hotkeysItem = within(container).getByText("Sobre");
         expect(hotkeysItem).toHaveAttribute("href", "/");
       });
+    });
+
+    test("should render clear history button in Portuguese", async () => {
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText("Limpar histórico");
+        expect(clearButton).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Clear History Button", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+    });
+
+    test("should call clearAllItems when confirmed", async () => {
+      const clearAllItemsSpy = spyOn(
+        tauriApi,
+        "clearAllItems",
+      ).mockResolvedValue(undefined);
+      const confirmSpy = spyOn(window, "confirm").mockReturnValue(true);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText(
+          "Clear clipboard history",
+        );
+        fireEvent.click(clearButton);
+      });
+
+      await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalled();
+        expect(clearAllItemsSpy).toHaveBeenCalled();
+      });
+
+      confirmSpy.mockRestore();
+      clearAllItemsSpy.mockRestore();
+    });
+
+    test("should not call clearAllItems when cancelled", async () => {
+      const clearAllItemsSpy = spyOn(
+        tauriApi,
+        "clearAllItems",
+      ).mockResolvedValue(undefined);
+      const confirmSpy = spyOn(window, "confirm").mockReturnValue(false);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText(
+          "Clear clipboard history",
+        );
+        fireEvent.click(clearButton);
+      });
+
+      await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalled();
+        expect(clearAllItemsSpy).not.toHaveBeenCalled();
+      });
+
+      confirmSpy.mockRestore();
+      clearAllItemsSpy.mockRestore();
+    });
+
+    test("should show confirmation dialog with correct message", async () => {
+      const confirmSpy = spyOn(window, "confirm").mockReturnValue(false);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText(
+          "Clear clipboard history",
+        );
+        fireEvent.click(clearButton);
+      });
+
+      await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalledWith(
+          "Are you sure you want to clear all clipboard history? This action cannot be undone.",
+        );
+      });
+
+      confirmSpy.mockRestore();
     });
   });
 });
