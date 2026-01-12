@@ -43,6 +43,7 @@ pub fn run() {
             items::delete_item,
             items::get_image_base64,
             items::write_image_to_clipboard,
+            items::clear_all_items,
             hotkeys::set_hotkey,
             hotkeys::get_hotkey,
             hotkeys::get_hold_behavior,

@@ -204,3 +204,28 @@ pub async fn write_image_to_clipboard(file_path: String) -> Result<(), String> {
 
     Ok(())
 }
+
+#[tauri::command]
+pub async fn clear_all_items(state: State<'_, AppState>) -> Result<(), String> {
+    // Get all image items to delete their files
+    let images: Vec<Item> =
+        sqlx::query_as::<_, Item>("SELECT * FROM items WHERE item_type = 'image'")
+            .fetch_all(&state.db)
+            .await
+            .map_err(|e| e.to_string())?;
+
+    // Delete image files from disk
+    for item in images {
+        if let Some(file_path) = item.file_path {
+            let _ = std::fs::remove_file(file_path);
+        }
+    }
+
+    // Clear all items from database
+    sqlx::query("DELETE FROM items")
+        .execute(&state.db)
+        .await
+        .map_err(|e| format!("Failed to clear items: {}", e))?;
+
+    Ok(())
+}
