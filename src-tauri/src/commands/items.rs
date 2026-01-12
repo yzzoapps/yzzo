@@ -237,3 +237,7 @@ pub async fn clear_all_items(
 
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "./tests/items_test.rs"]
+mod items_test;
