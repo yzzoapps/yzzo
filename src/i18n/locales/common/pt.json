@@ -4,6 +4,8 @@
     "preferences": "Preferências",
     "hotkeys": "Atalhos",
     "privacy": "Privacidade",
-    "about": "Sobre"
+    "about": "Sobre",
+    "clearHistory": "Limpar histórico",
+    "clearHistoryConfirm": "Tem certeza que deseja limpar todo o histórico da área de transferência? Esta ação não pode ser desfeita."
   }
 }

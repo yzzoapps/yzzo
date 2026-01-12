@@ -61,3 +61,12 @@ export async function writeImageToClipboard(filePath: string): Promise<void> {
     throw err;
   }
 }
+
+export async function clearAllItems(): Promise<void> {
+  try {
+    await invoke("clear_all_items");
+  } catch (err) {
+    console.error("Failed to clear all items:", err);
+    throw err;
+  }
+}

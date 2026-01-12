@@ -4,6 +4,8 @@
     "preferences": "Preferences",
     "hotkeys": "Hotkeys",
     "privacy": "Privacy",
-    "about": "About"
+    "about": "About",
+    "clearHistory": "Clear clipboard history",
+    "clearHistoryConfirm": "Are you sure you want to clear all clipboard history? This action cannot be undone."
   }
 }
