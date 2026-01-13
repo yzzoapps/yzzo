@@ -12,6 +12,12 @@
       "helperText": "Pressione este atalho para abrir o aplicativo.",
       "change": "Alterar",
       "behavior": "Comportamento do atalho"
+    },
+    "preferences": {
+      "theme": "Tema",
+      "themeLight": "Claro",
+      "themeDark": "Escuro",
+      "themeAuto": "Automático (sistema)"
     }
   }
 }
