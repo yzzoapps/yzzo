@@ -5,11 +5,24 @@ use tauri::{AppHandle, Manager, State};
 
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
+#[cfg(target_os = "macos")]
+pub const DEFAULT_HOTKEY: &str = "Cmd+`";
+
+#[cfg(not(target_os = "macos"))]
+pub const DEFAULT_HOTKEY: &str = "Alt+Q";
+
 pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<(), String> {
     let app_clone = app.clone();
 
+    println!("[DEBUG] Registering shortcut: {:?}", shortcut);
+
     app.global_shortcut()
-        .on_shortcut(shortcut, move |_app, _shortcut, event| {
+        .on_shortcut(shortcut, move |_app, shortcut, event| {
+            println!(
+                "[DEBUG] Shortcut triggered: {:?}, state: {:?}",
+                shortcut,
+                event.state()
+            );
             let hold_mode = crate::HOLD_BEHAVIOR.load(Ordering::Relaxed);
 
             if let Some(window) = app_clone.get_webview_window("main") {
@@ -62,6 +75,7 @@ pub fn parse_hotkey(hotkey: &str) -> Result<Shortcut, String> {
                 // it's the actual key (last part)
                 key = match part.trim() {
                     "`" => Code::Backquote,
+                    "'" => Code::Quote,
                     "A" => Code::KeyA,
                     "B" => Code::KeyB,
                     "C" => Code::KeyC,
@@ -117,13 +131,7 @@ pub async fn get_hotkey(state: State<'_, AppState>) -> Result<String, String> {
 
     match result {
         Some((value,)) => Ok(value),
-        None => {
-            #[cfg(target_os = "macos")]
-            return Ok("Cmd+`".to_string());
-
-            #[cfg(not(target_os = "macos"))]
-            return Ok("Alt+`".to_string());
-        }
+        None => Ok(DEFAULT_HOTKEY.to_string()),
     }
 }
 
@@ -133,12 +141,9 @@ pub async fn set_hotkey(
     state: State<'_, AppState>,
     hotkey: String,
 ) -> Result<(), String> {
-    let old_hotkey = get_hotkey(state.clone()).await.unwrap_or_else(|_| {
-        #[cfg(target_os = "macos")]
-        return "Cmd+`".to_string();
-        #[cfg(not(target_os = "macos"))]
-        return "Alt+`".to_string();
-    });
+    let old_hotkey = get_hotkey(state.clone())
+        .await
+        .unwrap_or_else(|_| DEFAULT_HOTKEY.to_string());
 
     if let Ok(old_shortcut) = crate::parse_hotkey(&old_hotkey) {
         let _ = app.global_shortcut().unregister(old_shortcut);
