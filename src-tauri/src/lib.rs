@@ -13,16 +13,10 @@ mod db;
 mod models;
 mod state;
 
-use commands::hotkeys::{get_hotkey, parse_hotkey};
+use commands::hotkeys::{DEFAULT_HOTKEY, get_hotkey, parse_hotkey};
 use commands::{hotkeys, items};
 use db::setup_db;
 use state::AppState;
-
-#[cfg(target_os = "macos")]
-const DEFAULT_HOTKEY: &str = "Cmd+`";
-
-#[cfg(not(target_os = "macos"))]
-const DEFAULT_HOTKEY: &str = "Alt+'";
 
 pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
 
