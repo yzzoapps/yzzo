@@ -3,6 +3,8 @@ import { useGlobalHotkey } from "@yzzo/hooks/useGlobalHotkey";
 import { Button, Header, Input, Label } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 
+const isMacOS = navigator.platform.toLowerCase().includes("mac");
+
 const Hotkeys: React.FC = () => {
   const { hotkey, holdBehavior, isLoading, updateHotkey, updateHoldBehavior } =
     useGlobalHotkey();
@@ -112,26 +114,27 @@ const Hotkeys: React.FC = () => {
             />
           </div>
         </div>
-
-        <div className="mb-6">
-          <Label label={t("components.settings.hotkey.behavior")} />
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={holdBehavior}
-              onChange={(e) => handleHoldBehaviorToggle(e.target.checked)}
-              className="w-4 h-4 cursor-pointer"
-            />
-            <div>
-              <span className="font-medium">Hold to show</span>
-              <p className="text-xs text-gray-500">
-                {holdBehavior
-                  ? "Window shows while holding hotkey, hides on release"
-                  : "Press hotkey to toggle window visibility"}
-              </p>
-            </div>
-          </label>
-        </div>
+        {isMacOS && (
+          <div className="mb-6">
+            <Label label={t("components.settings.hotkey.behavior")} />
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={holdBehavior}
+                onChange={(e) => handleHoldBehaviorToggle(e.target.checked)}
+                className="w-4 h-4 cursor-pointer"
+              />
+              <div>
+                <span className="font-medium">Hold to show</span>
+                <p className="text-xs text-gray-500">
+                  {holdBehavior
+                    ? "Window shows while holding hotkey, hides on release"
+                    : "Press hotkey to toggle window visibility"}
+                </p>
+              </div>
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );
