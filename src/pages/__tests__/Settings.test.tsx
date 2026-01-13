@@ -133,8 +133,11 @@ describe("Home page", () => {
       const { container } = render(<Settings />);
 
       await waitFor(() => {
-        const hotkeysItem = within(container).getByText("Preferences");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        const preferencesItem = within(container).getByText("Preferences");
+        expect(preferencesItem).toHaveAttribute(
+          "href",
+          "/settings/preferences",
+        );
       });
     });
 
@@ -204,8 +207,11 @@ describe("Home page", () => {
       const { container } = render(<Settings />);
 
       await waitFor(() => {
-        const hotkeysItem = within(container).getByText("Preferências");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        const preferencesItem = within(container).getByText("Preferências");
+        expect(preferencesItem).toHaveAttribute(
+          "href",
+          "/settings/preferences",
+        );
       });
     });
 
