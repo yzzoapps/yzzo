@@ -2,10 +2,9 @@ import React from "react";
 import { Header, Label } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@yzzo/contexts/ThemeContext";
+import type { Theme } from "@yzzo/types";
 
-type ThemeOption = "light" | "dark" | "auto";
-
-const themeOptions: { value: ThemeOption; labelKey: string }[] = [
+const themeOptions: { value: Theme; labelKey: string }[] = [
   { value: "light", labelKey: "components.settings.preferences.themeLight" },
   { value: "dark", labelKey: "components.settings.preferences.themeDark" },
   { value: "auto", labelKey: "components.settings.preferences.themeAuto" },
