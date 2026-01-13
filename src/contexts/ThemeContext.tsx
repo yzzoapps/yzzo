@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-type Theme = "light" | "dark" | "auto";
+import type { Theme } from "@yzzo/types";
 
 interface ThemeContextType {
   theme: Theme;
@@ -30,7 +29,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">(
-    getSystemTheme
+    getSystemTheme,
   );
 
   const effectiveTheme = theme === "auto" ? systemTheme : theme;
