@@ -14,7 +14,7 @@ pub const DEFAULT_HOTKEY: &str = "Alt+Q";
 pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<(), String> {
     let app_clone = app.clone();
 
-    println!("[DEBUG] Registering shortcut: {:?}", shortcut);
+    println!("[I] Registering shortcut: {:?}", shortcut);
 
     app.global_shortcut()
         .on_shortcut(shortcut, move |_app, shortcut, event| {
