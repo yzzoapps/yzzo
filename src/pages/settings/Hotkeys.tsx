@@ -126,7 +126,7 @@ const Hotkeys: React.FC = () => {
               />
               <div>
                 <span className="font-medium">Hold to show</span>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {holdBehavior
                     ? "Window shows while holding hotkey, hides on release"
                     : "Press hotkey to toggle window visibility"}

@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({
               />
             </div>
           )}
-          <h1 className="text-primary font-semibold text-center text-lg">
+          <h1 className="text-primary dark:text-secondary font-semibold text-center text-lg">
             {title}
           </h1>
         </>

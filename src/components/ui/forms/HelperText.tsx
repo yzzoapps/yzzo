@@ -6,7 +6,11 @@ interface HelperTextProps {
 }
 
 const HelperText: React.FC<HelperTextProps> = ({ text, className = "" }) => {
-  return <p className={`text-xs text-gray-500 mt-1 ${className}`}>{text}</p>;
+  return (
+    <p className={`text-xs text-gray-500 dark:text-gray-400 mt-1 ${className}`}>
+      {text}
+    </p>
+  );
 };
 
 export default HelperText;

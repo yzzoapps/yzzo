@@ -28,8 +28,8 @@ const Input: React.FC<InputProps> = ({
         value={value}
         readOnly={readOnly}
         placeholder={placeholder}
-        className={`w-full min-w-0 px-3 py-2 border border-neutral-300 rounded text-sm h-10
-          ${readOnly ? "bg-neutral-200 text-neutral-600 cursor-not-allowed" : "bg-white"}
+        className={`w-full min-w-0 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded text-sm h-10
+          ${readOnly ? "bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400 cursor-not-allowed" : "bg-white dark:bg-neutral-800 dark:text-neutral-white"}
           ${attachedToButton ? "rounded-r-none" : ""}
           ${className}`}
       />

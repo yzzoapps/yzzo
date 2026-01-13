@@ -143,11 +143,11 @@ const Home = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("components.home.searchPlaceholder")}
-          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
+          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
         />
       </div>
       <div
-        className={`h-1 w-full overflow-hidden relative ${!hasLoaded ? "bg-gray-200" : "bg-transparent"}`}
+        className={`h-1 w-full overflow-hidden relative ${!hasLoaded ? "bg-gray-200 dark:bg-gray-700" : "bg-transparent"}`}
       >
         {!hasLoaded && (
           <div
@@ -184,7 +184,7 @@ const Home = () => {
                     console.error("Failed to hide window:", error);
                   }
                 }}
-                className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black ${BORDER_BOTTOM} ${
+                className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black dark:text-neutral-white ${BORDER_BOTTOM} ${
                   idx === selectedIndex ? "bg-secondary/10" : ""
                 } cursor-pointer`}
               >
@@ -192,7 +192,7 @@ const Home = () => {
                   <div className="flex items-center gap-3">
                     <ImagePreview filePath={item.file_path} />
                     <span
-                      className="text-xs text-gray-500 line-clamp-1"
+                      className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1"
                       style={{ whiteSpace: "nowrap" }}
                     >
                       <HighlightedText
@@ -209,7 +209,7 @@ const Home = () => {
               </li>
             ))
           ) : hasLoaded ? (
-            <li className="py-8 px-4 text-center text-sm text-gray-500">
+            <li className="py-8 px-4 text-center text-sm text-gray-500 dark:text-gray-400">
               {searchQuery
                 ? t("components.home.noResults")
                 : t("components.home.noItems")}

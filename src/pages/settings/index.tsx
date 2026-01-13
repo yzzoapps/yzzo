@@ -20,7 +20,10 @@ const Settings = () => {
           name={t("common.settings.hotkeys")}
           route={"/settings/hotkeys"}
         />
-        <SettingsItem name={t("common.settings.preferences")} route={"/"} />
+        <SettingsItem
+          name={t("common.settings.preferences")}
+          route={"/settings/preferences"}
+        />
         <SettingsItem name={t("common.settings.privacy")} route={"/"} />
         <SettingsItem name={t("common.settings.about")} route={"/"} />
       </ul>

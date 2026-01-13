@@ -12,6 +12,12 @@
       "helperText": "Use this hotkey to open the app.",
       "change": "Change",
       "behavior": "Hotkey behavior"
+    },
+    "preferences": {
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeAuto": "Automatic (system)"
     }
   }
 }

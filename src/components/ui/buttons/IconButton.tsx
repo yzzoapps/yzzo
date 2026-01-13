@@ -28,8 +28,8 @@ const IconButton: React.FC<IconButtonProps> = ({
   const buttonStyle = `flex items-center text-lg cursor-pointer rounded-full justify-center transition-colors
     ${
       icon.background
-        ? "bg-gray-200 text-neutral-black p-1 hover:bg-gray-300"
-        : "bg-transparent text-primary hover:text-primary/80"
+        ? "bg-gray-200 dark:bg-gray-700 text-neutral-black dark:text-neutral-white p-1 hover:bg-gray-300 dark:hover:bg-gray-600"
+        : "bg-transparent text-primary dark:text-secondary hover:text-primary/80 dark:hover:text-secondary/80"
     }`;
 
   const buttonContent = (
