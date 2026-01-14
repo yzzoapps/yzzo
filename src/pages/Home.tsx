@@ -1,5 +1,5 @@
 import { getItems, bumpItem, writeImageToClipboard } from "@yzzo/api/tauriApi";
-import { Header, HighlightedText } from "@yzzo/components";
+import { Header, HighlightedText, Input } from "@yzzo/components";
 import ImagePreview from "@yzzo/components/home/ImagePreview";
 import { Item } from "@yzzo/models/Item";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
@@ -137,13 +137,12 @@ const Home = () => {
     <div className="flex flex-col h-screen">
       <Header type="primary" />
       <div className={`px-4 py-2 ${BORDER_BOTTOM}`}>
-        <input
+        <Input
           ref={searchInputRef}
-          type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("components.home.searchPlaceholder")}
-          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-300 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
+          className="rounded-full"
         />
       </div>
       <div
