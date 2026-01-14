@@ -18,7 +18,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({ name, route }) => {
   return (
     <button
       onClick={handleClick}
-      className={`flex justify-between items-center w-full px-4 py-3 hover:bg-secondary/10 cursor-pointer ${BORDER_BOTTOM}`}
+      className={`flex justify-between items-center w-full px-4 py-3 hover:bg-secondary/10 dark:hover:bg-secondary/5 cursor-pointer ${BORDER_BOTTOM}`}
     >
       <span>{name}</span>
       <HiChevronRight />
