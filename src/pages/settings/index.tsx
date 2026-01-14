@@ -27,7 +27,9 @@ const Settings = () => {
         <SettingsItem name={t("common.settings.privacy")} route={"/"} />
         <SettingsItem name={t("common.settings.about")} route={"/"} />
       </ul>
-      <div className={`px-4 py-4 ${BORDER_BOTTOM} items-center flex`}>
+      <div
+        className={`px-4 py-4 ${BORDER_BOTTOM} items-center justify-center flex`}
+      >
         <Button
           variant="danger"
           onClick={handleClearHistory}
