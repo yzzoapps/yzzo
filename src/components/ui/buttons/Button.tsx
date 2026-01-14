@@ -14,7 +14,7 @@ const buttonStyles = {
   base: "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors shrink-0 whitespace-nowrap cursor-pointer",
   variants: {
     default: "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-700",
-    danger: "text-red-500 hover:text-red-700 p-0!",
+    danger: "text-red-500 hover:text-red-700 dark:hover:text-red-300 p-0!",
     disabled: "bg-neutral-500 text-white cursor-not-allowed",
   },
   sizes: {
