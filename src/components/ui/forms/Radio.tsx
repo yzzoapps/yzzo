@@ -34,14 +34,19 @@ const Radio = <T extends string>({
             key={option.value}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <input
-              type="radio"
-              name={label}
-              value={option.value}
-              checked={selectedValue === option.value}
-              onChange={() => onChange(option.value)}
-              className="w-4 h-4 cursor-pointer accent-primary-600"
-            />
+            <div className="relative flex items-center justify-center">
+              <input
+                type="radio"
+                name={label}
+                value={option.value}
+                checked={selectedValue === option.value}
+                onChange={() => onChange(option.value)}
+                className="appearance-none w-4 h-4 border-2 border-neutral-400 dark:border-neutral-500 rounded-full checked:border-secondary dark:checked:border-accent cursor-pointer"
+              />
+              {selectedValue === option.value && (
+                <div className="absolute w-2 h-2 bg-secondary dark:bg-accent rounded-full pointer-events-none" />
+              )}
+            </div>
             <span className="text-sm text-neutral-800 dark:text-neutral-200">
               {t(option.labelKey)}
             </span>
