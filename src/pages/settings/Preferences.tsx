@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, Label } from "@yzzo/components";
+import { Header, Radio } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@yzzo/contexts/ThemeContext";
 import type { Theme } from "@yzzo/types";
@@ -22,27 +22,12 @@ const Preferences: React.FC = () => {
       />
 
       <div className="flex flex-col gap-4 p-4">
-        <div>
-          <Label label={t("components.settings.preferences.theme")} />
-          <div className="flex flex-col gap-2 mt-2">
-            {themeOptions.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="theme"
-                  value={option.value}
-                  checked={theme === option.value}
-                  onChange={() => setTheme(option.value)}
-                  className="w-4 h-4 cursor-pointer"
-                />
-                <span>{t(option.labelKey)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        <Radio<Theme>
+          label={t("components.settings.preferences.theme")}
+          selectedValue={theme}
+          options={themeOptions}
+          onChange={setTheme}
+        />
       </div>
     </div>
   );
