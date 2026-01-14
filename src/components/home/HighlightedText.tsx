@@ -5,7 +5,7 @@ interface HighlightedTextProps {
 
 const HighlightedText: React.FC<HighlightedTextProps> = ({ text, query }) => {
   if (!query.trim()) {
-    return <>{text}</>;
+    return <span className="dark:text-neutral-white">{text}</span>;
   }
 
   const parts = text.split(new RegExp(`(${query})`, "gi"));

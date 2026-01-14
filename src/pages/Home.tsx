@@ -185,7 +185,9 @@ const Home = () => {
                   }
                 }}
                 className={`py-3 px-4 w-full wrap-break-word text-sm text-neutral-black dark:text-neutral-white ${BORDER_BOTTOM} ${
-                  idx === selectedIndex ? "bg-secondary/10" : ""
+                  idx === selectedIndex
+                    ? "bg-secondary/10 dark:bg-secondary/5"
+                    : ""
                 } cursor-pointer`}
               >
                 {item.item_type === "image" && item.file_path ? (
