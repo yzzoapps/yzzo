@@ -143,7 +143,7 @@ const Home = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("components.home.searchPlaceholder")}
-          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
+          className={`${BORDER_BOTTOM} w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-300 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent rounded-full`}
         />
       </div>
       <div
@@ -192,7 +192,7 @@ const Home = () => {
                   <div className="flex items-center gap-3">
                     <ImagePreview filePath={item.file_path} />
                     <span
-                      className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1"
+                      className="text-xs text-gray-500 dark:text-gray-500 line-clamp-1"
                       style={{ whiteSpace: "nowrap" }}
                     >
                       <HighlightedText
