@@ -19,7 +19,7 @@ pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<()
     app.global_shortcut()
         .on_shortcut(shortcut, move |_app, shortcut, event| {
             println!(
-                "[DEBUG] Shortcut triggered: {:?}, state: {:?}",
+                "[I] Shortcut triggered: {:?}, state: {:?}",
                 shortcut,
                 event.state()
             );
