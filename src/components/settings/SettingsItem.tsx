@@ -22,7 +22,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({ name, route, value }) => {
       className={`flex justify-between items-center w-full px-4 py-3 hover:bg-secondary/10 dark:hover:bg-secondary/5 cursor-pointer ${BORDER_BOTTOM}`}
     >
       <span>{name}</span>
-      <div className="flex items-center gap-1 text-secondary">
+      <div className="flex items-center gap-1 text-primary dark:text-accent">
         {value && <span>{value}</span>}
         <HiChevronRight />
       </div>
