@@ -18,7 +18,7 @@ const About: React.FC = () => {
     <div>
       <Header title={t("common.settings.about")} previousRoute={"/settings"} />
 
-      <div className="flex flex-col items-center gap-6 p-6">
+      <div className="flex flex-col gap-6 p-6">
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 flex flex-row gap-1 items-center">
             <img src="/icon.svg" alt="Logo" className="h-full w-auto" />
@@ -31,7 +31,7 @@ const About: React.FC = () => {
           {t("components.settings.about.description")}
         </p>
 
-        <div className="flex flex-col gap-2 text-center">
+        <div className="flex flex-col gap-2">
           <p className={descriptionStyle}>
             {t("components.settings.about.author")}{" "}
             <ExternalLink href={LINKS.AUTHOR_WEBSITE}>
@@ -42,7 +42,7 @@ const About: React.FC = () => {
           </p>
         </div>
 
-        <div className="text-center">
+        <div>
           <p className={descriptionStyle}>
             {t("components.settings.about.license")}
           </p>

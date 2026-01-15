@@ -10,7 +10,7 @@ const Privacy: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div>
+    <>
       <Header
         title={t("common.settings.privacy")}
         previousRoute={"/settings"}
@@ -54,7 +54,7 @@ const Privacy: React.FC = () => {
           </p>
         </section>
       </div>
-    </div>
+    </>
   );
 };
 
