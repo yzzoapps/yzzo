@@ -42,7 +42,7 @@ const Settings = () => {
         />
       </ul>
       <div
-        className={`px-4 py-4 ${BORDER_BOTTOM} items-center justify-center flex`}
+        className={`px-4 py-2 ${BORDER_BOTTOM} items-center justify-center flex`}
       >
         <Button
           variant="danger"
