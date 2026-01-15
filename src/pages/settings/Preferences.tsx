@@ -3,6 +3,7 @@ import { Header, Radio, SettingsItem } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { useTheme, useLanguage } from "@yzzo/contexts";
 import type { Theme } from "@yzzo/types";
+import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 
 const themeOptions: { value: Theme; labelKey: string }[] = [
   { value: "light", labelKey: "components.settings.preferences.themeLight" },
@@ -41,7 +42,7 @@ const Preferences: React.FC = () => {
       </div>
 
       <SettingsItem
-        name={t("components.settings.language.title")}
+        name={t("common.settings.language")}
         route="/settings/preferences/language"
         value={getLanguageLabel()}
       />

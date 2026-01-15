@@ -17,7 +17,7 @@ const LanguagePage: React.FC = () => {
   return (
     <div>
       <Header
-        title={t("components.settings.language.title")}
+        title={t("common.settings.language")}
         previousRoute={"/settings/preferences"}
       />
 
