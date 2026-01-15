@@ -1,7 +1,74 @@
-# Tauri + React + Typescript
+# YZZO - Clipboard Manager
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+A modern clipboard manager built for simplicity and productivity. YZZO is completely free and open-source software.
 
-## Recommended IDE Setup
+**Available for Linux and macOS only.**
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Privacy first
+
+- **No data collection**: YZZO does not collect, transmit, or share any of your data.
+- **Local storage only**: All clipboard history is stored locally on your device using SQLite
+- **Complete privacy**: Your clipboard data never leaves your computer.
+
+## Prerequisites
+
+Before getting started, you'll need to install a few tools:
+
+1. **Bun** - Fast JavaScript runtime and package manager
+   - Install from: https://bun.com/docs/installation
+   - Note: You can also use npm or another package manager, but you'll need to adjust the startup scripts in `package.json`
+
+2. **Tauri + Rust** - Desktop app framework
+   - Follow the installation guide: https://tauri.app/start/prerequisites/ (You may skip the mobile setup).
+
+## Getting started
+
+After installing the prerequisites and restarting your terminal:
+
+```bash
+# Install dependencies
+bun install
+
+# Start development server
+bun run tauri dev
+```
+
+You're now ready for development!
+
+## Tech stack
+
+- **Frontend**: React, TanStack Router, TailwindCSS
+- **Runtime**: Bun
+- **Backend**: Rust
+- **Database**: SQLite
+- **Framework**: Tauri
+
+## Development environment
+
+This app was built with [Zed](https://zed.dev) using the [Nyx theme](https://github.com/luccaromaniello/nyx), but feel free to use the code editor you wish.
+
+## Project structure
+
+- `/src` - React frontend code
+- `/src/routes` - Application routes (TanStack Router)
+- `/src-tauri` - Rust backend code
+
+## Building for production
+
+```bash
+bun run tauri build
+```
+
+This will create optimized binaries for your platform in `src-tauri/target/release`.
+
+## Feedback & Bug Reports
+
+Have feedback, found a bug, or want to request a feature? Please [open an issue on GitHub](https://github.com/yzzoapps/yzzo/issues).
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
+See the [LICENSE](LICENSE) file for the complete license text.
+
+## Author
+Created by [Lucca Romaniello](https://github.com/luccaromaniello).
