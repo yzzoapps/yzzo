@@ -1,7 +1,6 @@
 import React from "react";
 import { Header, ExternalLink } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { LINKS } from "@yzzo/constants";
 
 const headerStyle = "font-semibold text-primary dark:text-white mb-1";
