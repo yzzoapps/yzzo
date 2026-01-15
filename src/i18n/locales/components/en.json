@@ -33,6 +33,12 @@
       "imageStorageDescription": "Copied images are saved locally in your app data folder. They are only accessible by this application.",
       "feedback": "Feedback and requests",
       "feedbackDescription": "If you have any feature requests, bug reports, or questions, please open an issue on"
+    },
+    "about": {
+      "description": "A clipboard manager built for simplicity and productivity.",
+      "author": "Made by",
+      "support": "If you like YZZO, consider giving it a star on",
+      "license": "GPL-3.0 license"
     }
   }
 }
