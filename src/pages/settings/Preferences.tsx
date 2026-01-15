@@ -6,9 +6,9 @@ import type { Theme } from "@yzzo/types";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 
 const themeOptions: { value: Theme; labelKey: string }[] = [
+  { value: "auto", labelKey: "components.settings.preferences.themeAuto" },
   { value: "light", labelKey: "components.settings.preferences.themeLight" },
   { value: "dark", labelKey: "components.settings.preferences.themeDark" },
-  { value: "auto", labelKey: "components.settings.preferences.themeAuto" },
 ];
 
 const Preferences: React.FC = () => {
