@@ -18,6 +18,12 @@
       "themeLight": "Claro",
       "themeDark": "Escuro",
       "themeAuto": "Automático (sistema)"
+    },
+    "language": {
+      "title": "Idioma",
+      "system": "Padrão do sistema",
+      "en": "Inglês",
+      "pt": "Português"
     }
   }
 }

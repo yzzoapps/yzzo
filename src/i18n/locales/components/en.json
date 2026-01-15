@@ -18,6 +18,12 @@
       "themeLight": "Light",
       "themeDark": "Dark",
       "themeAuto": "Automatic (system)"
+    },
+    "language": {
+      "title": "Language",
+      "system": "System default",
+      "en": "English",
+      "pt": "Portuguese"
     }
   }
 }
