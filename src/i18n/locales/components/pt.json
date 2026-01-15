@@ -33,6 +33,12 @@
       "imageStorageDescription": "Imagens copiadas são salvas localmente na pasta de dados do aplicativo. Elas são acessíveis apenas por este aplicativo.",
       "feedback": "Feedback e solicitações",
       "feedbackDescription": "Se você tiver sugestões de funcionalidades, quiser reportar um bug ou tiver quaisquer dúvidas, por favor abra uma issue no"
+    },
+    "about": {
+      "description": "Um gerenciador de área de transferência feito para simplicidade e produtividade.",
+      "author": "Feito por",
+      "support": "Se você gosta do YZZO, considere dar uma estrela no",
+      "license": "Licença GPL-3.0"
     }
   }
 }
