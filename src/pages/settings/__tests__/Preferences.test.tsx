@@ -7,11 +7,22 @@ import Preferences from "../Preferences";
 const mockSetTheme = mock(() => {});
 let mockTheme = "light";
 
+const mockSetLanguage = mock(() => {});
+let mockLanguage = "system";
+
 mock.module("@yzzo/contexts/ThemeContext", () => ({
   useTheme: () => ({
     theme: mockTheme,
     effectiveTheme: mockTheme === "auto" ? "light" : mockTheme,
     setTheme: mockSetTheme,
+  }),
+}));
+
+mock.module("@yzzo/contexts/LanguageContext", () => ({
+  useLanguage: () => ({
+    language: mockLanguage,
+    effectiveLanguage: mockLanguage === "system" ? "en" : mockLanguage,
+    setLanguage: mockSetLanguage,
   }),
 }));
 
@@ -25,6 +36,12 @@ mock.module("@yzzo/components", () => ({
     </header>
   ),
   Label: ({ label }: any) => <label data-testid="label">{label}</label>,
+  SettingsItem: ({ name, route, value }: any) => (
+    <button data-testid="settings-item" data-route={route}>
+      <span>{name}</span>
+      {value && <span data-testid="settings-item-value">{value}</span>}
+    </button>
+  ),
 }));
 
 describe("Preferences page", () => {
@@ -32,6 +49,8 @@ describe("Preferences page", () => {
     setupI18nMock("en");
     mockTheme = "light";
     mockSetTheme.mockClear();
+    mockLanguage = "system";
+    mockSetLanguage.mockClear();
   });
 
   describe("Structure", () => {
@@ -91,7 +110,9 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const radios = within(container).getAllByRole("radio") as HTMLInputElement[];
+        const radios = within(container).getAllByRole(
+          "radio",
+        ) as HTMLInputElement[];
         expect(radios[0].checked).toBe(true); // Light
         expect(radios[1].checked).toBe(false); // Dark
         expect(radios[2].checked).toBe(false); // Auto
@@ -103,7 +124,9 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const radios = within(container).getAllByRole("radio") as HTMLInputElement[];
+        const radios = within(container).getAllByRole(
+          "radio",
+        ) as HTMLInputElement[];
         expect(radios[0].checked).toBe(false); // Light
         expect(radios[1].checked).toBe(true); // Dark
         expect(radios[2].checked).toBe(false); // Auto
@@ -115,7 +138,9 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const radios = within(container).getAllByRole("radio") as HTMLInputElement[];
+        const radios = within(container).getAllByRole(
+          "radio",
+        ) as HTMLInputElement[];
         expect(radios[0].checked).toBe(false); // Light
         expect(radios[1].checked).toBe(false); // Dark
         expect(radios[2].checked).toBe(true); // Auto
