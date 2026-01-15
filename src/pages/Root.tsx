@@ -1,6 +1,6 @@
 import { Outlet } from "@tanstack/react-router";
 import "@yzzo/styles/App.css";
-import { useClipboardEventWatcher } from "@yzzo/hooks/useClipboardWatcher";
+import { useClipboardEventWatcher } from "@yzzo/hooks";
 
 const Root = () => {
   useClipboardEventWatcher();

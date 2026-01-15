@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useGlobalHotkey } from "@yzzo/hooks/useGlobalHotkey";
+import { useGlobalHotkey } from "@yzzo/hooks";
 import { Button, Header, Input, Label } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 
