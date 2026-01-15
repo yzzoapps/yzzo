@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_positioner::{self};
+use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
 mod commands;
@@ -21,7 +21,7 @@ use state::AppState;
 pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
 
 pub fn run() {
-    let app = tauri::Builder::default()
+    let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--tray-only"]),
@@ -119,10 +119,26 @@ pub fn run() {
                     eprintln!("[X] No default window icon available for tray");
                 }
 
-                // on Linux, show the window by default since tray behavior is unreliable
+                #[cfg(target_os = "macos")]
+                {
+                    // on macOS, keep window hidden - only show via tray icon click
+                    if let Some(window) = handle.get_webview_window("main") {
+                        let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize {
+                            width: 340.0,
+                            height: 480.0,
+                        }));
+                        let _ = window.hide();
+                    }
+                }
+
                 #[cfg(target_os = "linux")]
                 {
+                    // on Linux, show the window by default since tray behavior is unreliable
                     if let Some(window) = handle.get_webview_window("main") {
+                        let _ = window.set_size(tauri::Size::Physical(tauri::PhysicalSize {
+                            width: 800,
+                            height: 600,
+                        }));
                         let _ = window.set_resizable(true);
                         let _ = window.show();
                         let _ = window.set_focus();
