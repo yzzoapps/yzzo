@@ -22,6 +22,14 @@ pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
 
 pub fn run() {
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            // when a second instance is launched, focus the existing window
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--tray-only"]),
@@ -127,6 +135,11 @@ pub fn run() {
                             width: 340.0,
                             height: 480.0,
                         }));
+                        let _ = window.set_title("");
+                        let _ = window.set_minimizable(false);
+                        let _ = window.set_maximizable(false);
+                        let _ = window.set_closable(false);
+                        let _ = window.set_title_bar_style(tauri::TitleBarStyle::Overlay);
                         let _ = window.hide();
                     }
                 }
