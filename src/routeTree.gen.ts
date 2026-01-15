@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsPrivacyRouteImport } from './routes/settings_.privacy'
 import { Route as SettingsPreferencesRouteImport } from './routes/settings_.preferences'
 import { Route as SettingsHotkeysRouteImport } from './routes/settings_.hotkeys'
 import { Route as SettingsPreferencesLanguageRouteImport } from './routes/settings_.preferences_.language'
@@ -23,6 +24,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsPrivacyRoute = SettingsPrivacyRouteImport.update({
+  id: '/settings_/privacy',
+  path: '/settings/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsPreferencesRoute = SettingsPreferencesRouteImport.update({
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/settings/hotkeys': typeof SettingsHotkeysRoute
   '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/privacy': typeof SettingsPrivacyRoute
   '/settings/preferences/language': typeof SettingsPreferencesLanguageRoute
 }
 export interface FileRoutesByTo {
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/settings/hotkeys': typeof SettingsHotkeysRoute
   '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/privacy': typeof SettingsPrivacyRoute
   '/settings/preferences/language': typeof SettingsPreferencesLanguageRoute
 }
 export interface FileRoutesById {
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/settings_/hotkeys': typeof SettingsHotkeysRoute
   '/settings_/preferences': typeof SettingsPreferencesRoute
+  '/settings_/privacy': typeof SettingsPrivacyRoute
   '/settings_/preferences_/language': typeof SettingsPreferencesLanguageRoute
 }
 export interface FileRouteTypes {
@@ -71,6 +80,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/settings/hotkeys'
     | '/settings/preferences'
+    | '/settings/privacy'
     | '/settings/preferences/language'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -78,6 +88,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/settings/hotkeys'
     | '/settings/preferences'
+    | '/settings/privacy'
     | '/settings/preferences/language'
   id:
     | '__root__'
@@ -85,6 +96,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/settings_/hotkeys'
     | '/settings_/preferences'
+    | '/settings_/privacy'
     | '/settings_/preferences_/language'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +105,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SettingsHotkeysRoute: typeof SettingsHotkeysRoute
   SettingsPreferencesRoute: typeof SettingsPreferencesRoute
+  SettingsPrivacyRoute: typeof SettingsPrivacyRoute
   SettingsPreferencesLanguageRoute: typeof SettingsPreferencesLanguageRoute
 }
 
@@ -110,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/privacy': {
+      id: '/settings_/privacy'
+      path: '/settings/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof SettingsPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings_/preferences': {
@@ -141,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SettingsHotkeysRoute: SettingsHotkeysRoute,
   SettingsPreferencesRoute: SettingsPreferencesRoute,
+  SettingsPrivacyRoute: SettingsPrivacyRoute,
   SettingsPreferencesLanguageRoute: SettingsPreferencesLanguageRoute,
 }
 export const routeTree = rootRouteImport
