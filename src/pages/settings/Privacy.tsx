@@ -1,5 +1,5 @@
 import React from "react";
-import { Header } from "@yzzo/components";
+import { Header, ExternalLink } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { LINKS } from "@yzzo/constants";
@@ -51,19 +51,7 @@ const Privacy: React.FC = () => {
           </h2>
           <p className={descriptionStyle}>
             {t("components.settings.privacy.feedbackDescription")}{" "}
-            <button
-              onClick={async () => {
-                try {
-                  await openUrl(LINKS.GITHUB_ISSUES);
-                } catch (e) {
-                  console.error("Failed to open URL:", e);
-                }
-              }}
-              className="text-secondary hover:underline font-semibold hover:cursor-pointer focus:outline-none"
-            >
-              GitHub
-            </button>
-            .
+            <ExternalLink href={LINKS.GITHUB_ISSUES}>GitHub</ExternalLink>.
           </p>
         </section>
       </div>
