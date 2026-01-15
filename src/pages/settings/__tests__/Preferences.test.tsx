@@ -113,9 +113,9 @@ describe("Preferences page", () => {
         const radios = within(container).getAllByRole(
           "radio",
         ) as HTMLInputElement[];
-        expect(radios[0].checked).toBe(true); // Light
-        expect(radios[1].checked).toBe(false); // Dark
-        expect(radios[2].checked).toBe(false); // Auto
+        expect(radios[0].checked).toBe(false); // Auto
+        expect(radios[1].checked).toBe(true); // Light
+        expect(radios[2].checked).toBe(false); // Dark
       });
     });
 
@@ -127,9 +127,9 @@ describe("Preferences page", () => {
         const radios = within(container).getAllByRole(
           "radio",
         ) as HTMLInputElement[];
-        expect(radios[0].checked).toBe(false); // Light
-        expect(radios[1].checked).toBe(true); // Dark
-        expect(radios[2].checked).toBe(false); // Auto
+        expect(radios[0].checked).toBe(false); // Auto
+        expect(radios[1].checked).toBe(false); // Light
+        expect(radios[2].checked).toBe(true); // Dark
       });
     });
 
@@ -141,9 +141,9 @@ describe("Preferences page", () => {
         const radios = within(container).getAllByRole(
           "radio",
         ) as HTMLInputElement[];
-        expect(radios[0].checked).toBe(false); // Light
-        expect(radios[1].checked).toBe(false); // Dark
-        expect(radios[2].checked).toBe(true); // Auto
+        expect(radios[0].checked).toBe(true); // Auto
+        expect(radios[1].checked).toBe(false); // Light
+        expect(radios[2].checked).toBe(false); // Dark
       });
     });
 
@@ -151,7 +151,7 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const darkRadio = within(container).getAllByRole("radio")[1];
+        const darkRadio = within(container).getAllByRole("radio")[2];
         fireEvent.click(darkRadio);
       });
 
@@ -163,7 +163,7 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const lightRadio = within(container).getAllByRole("radio")[0];
+        const lightRadio = within(container).getAllByRole("radio")[1];
         fireEvent.click(lightRadio);
       });
 
@@ -174,7 +174,7 @@ describe("Preferences page", () => {
       const { container } = render(<Preferences />);
 
       await waitFor(() => {
-        const autoRadio = within(container).getAllByRole("radio")[2];
+        const autoRadio = within(container).getAllByRole("radio")[0];
         fireEvent.click(autoRadio);
       });
 

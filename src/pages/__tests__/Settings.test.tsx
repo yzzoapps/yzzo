@@ -146,7 +146,7 @@ describe("Home page", () => {
 
       await waitFor(() => {
         const hotkeysItem = within(container).getByText("Privacy");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        expect(hotkeysItem).toHaveAttribute("href", "/settings/privacy");
       });
     });
 
@@ -155,7 +155,7 @@ describe("Home page", () => {
 
       await waitFor(() => {
         const hotkeysItem = within(container).getByText("About");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        expect(hotkeysItem).toHaveAttribute("href", "/settings/about");
       });
     });
   });
@@ -220,7 +220,7 @@ describe("Home page", () => {
 
       await waitFor(() => {
         const hotkeysItem = within(container).getByText("Privacidade");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        expect(hotkeysItem).toHaveAttribute("href", "/settings/privacy");
       });
     });
 
@@ -229,7 +229,7 @@ describe("Home page", () => {
 
       await waitFor(() => {
         const hotkeysItem = within(container).getByText("Sobre");
-        expect(hotkeysItem).toHaveAttribute("href", "/");
+        expect(hotkeysItem).toHaveAttribute("href", "/settings/about");
       });
     });
 
