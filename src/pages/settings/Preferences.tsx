@@ -1,7 +1,7 @@
 import React from "react";
-import { Header, Radio } from "@yzzo/components";
+import { Header, Radio, SettingsItem } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@yzzo/contexts/ThemeContext";
+import { useTheme, useLanguage } from "@yzzo/contexts";
 import type { Theme } from "@yzzo/types";
 
 const themeOptions: { value: Theme; labelKey: string }[] = [
@@ -13,6 +13,16 @@ const themeOptions: { value: Theme; labelKey: string }[] = [
 const Preferences: React.FC = () => {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const { language } = useLanguage();
+
+  const getLanguageLabel = () => {
+    const labels: Record<string, string> = {
+      system: t("components.settings.language.system"),
+      en: t("components.settings.language.en"),
+      pt: t("components.settings.language.pt"),
+    };
+    return labels[language] || language;
+  };
 
   return (
     <div>
@@ -29,6 +39,12 @@ const Preferences: React.FC = () => {
           onChange={setTheme}
         />
       </div>
+
+      <SettingsItem
+        name={t("components.settings.language.title")}
+        route="/settings/preferences/language"
+        value={getLanguageLabel()}
+      />
     </div>
   );
 };

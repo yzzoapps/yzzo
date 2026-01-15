@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { Theme } from "@yzzo/types";
+import { STORAGE_KEYS } from "@yzzo/constants";
 
 interface ThemeContextType {
   theme: Theme;
@@ -8,8 +9,6 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-const STORAGE_KEY = "yzzo-theme";
 
 function getSystemTheme(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -21,7 +20,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.THEME);
     if (stored === "light" || stored === "dark" || stored === "auto") {
       return stored;
     }
@@ -53,7 +52,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem(STORAGE_KEY, newTheme);
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
   };
 
   return (
