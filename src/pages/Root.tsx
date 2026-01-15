@@ -6,7 +6,7 @@ const Root = () => {
   useClipboardEventWatcher();
 
   return (
-    <div className="font-mona bg-white dark:bg-[#191B26] dark:bg-{} text-neutral-black dark:text-neutral-white flex flex-col h-screen w-full">
+    <div className="font-mona pt-2 bg-white dark:bg-[#191B26] dark:bg-{} text-neutral-black dark:text-neutral-white flex flex-col h-screen w-full">
       <Outlet />
     </div>
   );
