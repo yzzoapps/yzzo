@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Header } from "@yzzo/components";
+import { Header, ExternalLink } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
