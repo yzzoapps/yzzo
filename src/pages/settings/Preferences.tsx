@@ -32,7 +32,7 @@ const Preferences: React.FC = () => {
         previousRoute={"/settings"}
       />
 
-      <div className="flex flex-col gap-4 p-4">
+      <div className={`flex flex-col gap-4 p-4 ${BORDER_BOTTOM}`}>
         <Radio<Theme>
           label={t("components.settings.preferences.theme")}
           selectedValue={theme}
