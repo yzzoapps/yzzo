@@ -61,7 +61,7 @@ bun run tauri build
 
 This will create optimized binaries for your platform in `src-tauri/target/release`.
 
-## Feedback & Bug Reports
+## Feedback and bug reports
 
 Have feedback, found a bug, or want to request a feature? Please [open an issue on GitHub](https://github.com/yzzoapps/yzzo/issues).
 
