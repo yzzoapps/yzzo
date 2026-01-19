@@ -91,9 +91,9 @@ const Hotkeys: React.FC = () => {
 
       <div className="flex flex-col gap-4 p-4">
         <div>
+          <Label label={t("components.settings.hotkey.title")} />
           <div className="flex flex-row w-full">
             <Input
-              label={t("components.settings.hotkey.title")}
               readOnly
               value={
                 isListening
@@ -101,18 +101,20 @@ const Hotkeys: React.FC = () => {
                     t("components.settings.hotkey.listeningPlaceholder")
                   : hotkey
               }
-              helperText={t("components.settings.hotkey.helperText")}
               className="w-2/3"
               attachedToButton
             />
             <Button
               variant={isListening ? "danger" : "default"}
               onClick={handleChangeHotkey}
-              className="w-1/3 self-end mb-6"
+              className="w-1/3"
               label={isListening ? "Cancel" : "Change"}
               attachedToInput
             />
           </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {t("components.settings.hotkey.helperText")}
+          </p>
         </div>
         {isMacOS && (
           <div className="mb-6">
