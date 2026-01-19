@@ -6,6 +6,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { HiCog6Tooth } from "react-icons/hi2";
 import { IconButton } from "@yzzo/components";
+import { useTheme } from "@yzzo/contexts";
 
 interface HeaderProps {
   type?: "primary" | "secondary";
@@ -18,6 +19,8 @@ const Header: React.FC<HeaderProps> = ({
   title,
   previousRoute,
 }) => {
+  const { effectiveTheme } = useTheme();
+
   return (
     <nav
       className={
@@ -43,8 +46,14 @@ const Header: React.FC<HeaderProps> = ({
       ) : (
         <>
           <Link to="/" className="h-10 flex flex-row gap-1 items-center">
-            <img src="/icon.svg" alt="Logo" className="h-full w-auto" />
-            <img src="/text.svg" alt="Logo" className="h-5 w-auto" />
+            <img src="/icon.svg" alt="YZZO logo" className="h-full w-auto" />
+            <img
+              src={
+                effectiveTheme === "dark" ? "/text-dark.svg" : "/text-light.svg"
+              }
+              alt="YZZO text from logo"
+              className="h-5 w-auto"
+            />
           </Link>
           <div className="flex flex-row gap-4 items-start">
             <IconButton
