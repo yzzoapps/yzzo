@@ -18,7 +18,7 @@ const About: React.FC = () => {
     <div>
       <Header title={t("common.settings.about")} previousRoute={"/settings"} />
 
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-6 px-4 py-6">
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 flex flex-row gap-1 items-center">
             <img src="/icon.svg" alt="Logo" className="h-full w-auto" />
