@@ -17,15 +17,14 @@
     "windows": [
       {
         "label": "main",
-        "visible": false,
-        "closable": false,
-        "resizable": false,
-        "maximizable": false,
-        "minimizable": true,
+        "title": "YZZO - Clipboard Manager",
         "width": 320,
         "height": 560,
-        "title": "YZZO - Clipboard Manager",
-        "transparent": true
+        "visible": false,
+        "resizable": true,
+        "minimizable": true,
+        "maximizable": false,
+        "closable": true
       }
     ],
     "security": {
