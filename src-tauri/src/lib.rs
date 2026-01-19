@@ -132,7 +132,7 @@ pub fn run() {
                     if let Some(window) = handle.get_webview_window("main") {
                         let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize {
                             width: 340.0,
-                            height: 480.0,
+                            height: 560.0,
                         }));
                         let _ = window.set_title("YZZO - Clipboard Manager");
                         let _ = window.set_minimizable(true);
