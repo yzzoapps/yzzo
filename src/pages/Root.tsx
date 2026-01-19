@@ -10,7 +10,7 @@ const Root = () => {
   useFirstLaunchNotification();
 
   return (
-    <div className="font-mona pt-2 bg-white dark:bg-[#191B26] dark:bg-{} text-neutral-black dark:text-neutral-white flex flex-col h-screen w-full">
+    <div className="font-mona pt-2 bg-white dark:bg-[#191B26] text-neutral-black dark:text-neutral-white flex flex-col h-screen w-full overflow-hidden overscroll-none">
       <Outlet />
     </div>
   );

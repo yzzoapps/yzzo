@@ -10,13 +10,13 @@ const Privacy: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title={t("common.settings.privacy")}
         previousRoute={"/settings"}
       />
 
-      <div className="flex flex-col gap-6 p-4">
+      <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-4">
         <section>
           <h2 className={headerStyle}>
             {t("components.settings.privacy.dataStorage")}
@@ -54,7 +54,7 @@ const Privacy: React.FC = () => {
           </p>
         </section>
       </div>
-    </>
+    </div>
   );
 };
 
