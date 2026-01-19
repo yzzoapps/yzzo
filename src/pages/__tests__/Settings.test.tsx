@@ -67,40 +67,35 @@ describe("Home page", () => {
   });
 
   describe("Translation keys", () => {
+    const keysToCheck = [
+      "common.settings.title",
+      "common.settings.hotkeys",
+      "common.settings.preferences",
+      "common.settings.privacy",
+      "common.settings.about",
+      "common.settings.clearHistory.label",
+      "common.settings.clearHistory.dialog",
+      "common.settings.clearHistory.dialog.title",
+      "common.settings.clearHistory.dialog.description",
+      "common.settings.clearHistory.dialog.okLabel",
+      "common.settings.clearHistory.dialog.cancelLabel",
+      "common.settings.quit.label",
+      "common.settings.quit.dialog",
+      "common.settings.quit.dialog.title",
+      "common.settings.quit.dialog.description",
+      "common.settings.quit.dialog.okLabel",
+      "common.settings.quit.dialog.cancelLabel",
+      "common.notifications.firstLaunch",
+    ];
+
     describe("common", () => {
       test("all Settings page keys should exist in English", () => {
-        const keysToCheck = [
-          "common.settings.title",
-          "common.settings.hotkeys",
-          "common.settings.preferences",
-          "common.settings.privacy",
-          "common.settings.about",
-          "common.settings.clearHistory",
-          "common.settings.clearHistoryConfirm",
-          "common.settings.quit",
-          "common.settings.quitConfirm",
-          "common.dialog.cancel",
-        ];
-
         keysToCheck.forEach((key) => {
           expect(hasTranslationKey(key, "en")).toBe(true);
         });
       });
 
       test("all Settings page keys should exist in Portuguese", () => {
-        const keysToCheck = [
-          "common.settings.title",
-          "common.settings.hotkeys",
-          "common.settings.preferences",
-          "common.settings.privacy",
-          "common.settings.about",
-          "common.settings.clearHistory",
-          "common.settings.clearHistoryConfirm",
-          "common.settings.quit",
-          "common.settings.quitConfirm",
-          "common.dialog.cancel",
-        ];
-
         keysToCheck.forEach((key) => {
           expect(hasTranslationKey(key, "pt")).toBe(true);
         });
@@ -127,6 +122,16 @@ describe("Home page", () => {
         const clearButton = within(container).getByText(
           "Clear clipboard history",
         );
+        expect(clearButton).toBeInTheDocument();
+        expect(clearButton.tagName).toBe("BUTTON");
+      });
+    });
+
+    test("should render quit button", async () => {
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText("Quit");
         expect(clearButton).toBeInTheDocument();
         expect(clearButton.tagName).toBe("BUTTON");
       });
@@ -254,17 +259,29 @@ describe("Home page", () => {
       });
     });
 
-    test("should render clear history button in Portuguese", async () => {
+    test("should render clear history button", async () => {
       const { container } = render(<Settings />);
 
       await waitFor(() => {
-        const clearButton = within(container).getByText("Limpar histórico");
+        const clearButton = within(container).getByText(
+          "Limpar histórico da área de transferência",
+        );
         expect(clearButton).toBeInTheDocument();
+      });
+    });
+
+    test("should render quit button", async () => {
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const clearButton = within(container).getByText("Sair");
+        expect(clearButton).toBeInTheDocument();
+        expect(clearButton.tagName).toBe("BUTTON");
       });
     });
   });
 
-  describe("Clear History Button", () => {
+  describe("Clear history button", () => {
     beforeEach(() => {
       setupI18nMock("en");
       mockAsk.mockClear();
@@ -334,8 +351,10 @@ describe("Home page", () => {
         expect(mockAsk).toHaveBeenCalledWith(
           "Are you sure you want to clear all clipboard history? This action cannot be undone.",
           {
-            title: "Clear clipboard history",
+            title: "Clear clipboard history?",
             kind: "warning",
+            okLabel: "Clear history",
+            cancelLabel: "Cancel",
           },
         );
       });
@@ -405,10 +424,10 @@ describe("Home page", () => {
         expect(mockAsk).toHaveBeenCalledWith(
           "Are you sure you want to quit YZZO?",
           {
-            title: "Quit",
+            title: "Quit YZZO?",
             kind: "warning",
             okLabel: "Quit",
-            cancelLabel: "No, go back",
+            cancelLabel: "Go back",
           },
         );
       });
