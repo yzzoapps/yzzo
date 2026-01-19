@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_positioner::{self, Position, WindowExt};
+use tauri_plugin_positioner::{self};
 
 mod clipboard_watcher;
 mod commands;
@@ -134,11 +134,8 @@ pub fn run() {
                             width: 340.0,
                             height: 480.0,
                         }));
-                        let _ = window.set_title("");
-                        let _ = window.set_minimizable(false);
-                        let _ = window.set_maximizable(false);
-                        let _ = window.set_closable(false);
-                        let _ = window.set_title_bar_style(tauri::TitleBarStyle::Overlay);
+                        let _ = window.set_title("YZZO - Clipboard Manager");
+                        let _ = window.set_minimizable(true);
                         let _ = window.hide();
                     }
                 }
@@ -153,7 +150,6 @@ pub fn run() {
                         }));
                         let _ = window.skip_taskbar(true);
                         let _ = window.set_resizable(true);
-                        // try tray position, fall back to center
                         move_to_tray_or_center(&window);
                         let _ = window.show();
                         let _ = window.set_focus();
