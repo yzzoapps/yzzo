@@ -3,12 +3,14 @@ import { Header, ExternalLink } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
 import { LINKS } from "@yzzo/constants";
+import { useTheme } from "@yzzo/contexts";
 
 const descriptionStyle = "text-sm dark:text-gray-400";
 
 const About: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState<string>("");
+  const { effectiveTheme } = useTheme();
 
   useEffect(() => {
     getVersion().then(setVersion);
@@ -21,8 +23,14 @@ const About: React.FC = () => {
       <div className="flex flex-col gap-6 px-4 py-6">
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 flex flex-row gap-1 items-center">
-            <img src="/icon.svg" alt="Logo" className="h-full w-auto" />
-            <img src="/text.svg" alt="Logo" className="h-6 w-auto" />
+            <img src="/icon.svg" alt="YZZO logo" className="h-full w-auto" />
+            <img
+              src={
+                effectiveTheme === "dark" ? "/text-dark.svg" : "/text-light.svg"
+              }
+              alt="YZZO text from logo"
+              className="h-5 w-auto"
+            />
           </div>
           <p className="text-gray-500 dark:text-gray-400 font-light">
             v{version}
