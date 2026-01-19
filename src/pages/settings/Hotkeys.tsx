@@ -101,14 +101,15 @@ const Hotkeys: React.FC = () => {
                     t("components.settings.hotkey.listeningPlaceholder")
                   : hotkey
               }
-              className="w-2/3"
               attachedToButton
             />
             <Button
               variant={isListening ? "danger" : "default"}
               onClick={handleChangeHotkey}
-              className="w-1/3"
-              label={isListening ? "Cancel" : "Change"}
+              className="w-auto"
+              label={
+                isListening ? "Cancel" : t("components.settings.hotkey.change")
+              }
               attachedToInput
             />
           </div>
