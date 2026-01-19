@@ -6,15 +6,26 @@
     "hotkeys": "Atalhos",
     "privacy": "Privacidade",
     "about": "Sobre",
-    "clearHistory": "Limpar histórico",
-    "clearHistoryConfirm": "Tem certeza que deseja limpar todo o histórico da área de transferência? Esta ação não pode ser desfeita.",
-    "quit": "Sair",
-    "quitConfirm": "Tem certeza que deseja sair do YZZO?"
+    "clearHistory": {
+      "label": "Limpar histórico da área de transferência",
+      "dialog": {
+        "title": "Clear clipboard history?",
+        "description": "Tem certeza que deseja limpar todo o histórico da área de transferência? Esta ação não pode ser desfeita.",
+        "okLabel": "Limpar histórico",
+        "cancelLabel": "Cancelar"
+      }
+    },
+    "quit": {
+      "label": "Sair",
+      "dialog": {
+        "title": "Sair do YZZO?",
+        "description": "Tem certeza que deseja sair do YZZO?",
+        "okLabel": "Sair",
+        "cancelLabel": "Voltar"
+      }
+    }
   },
   "notifications": {
     "firstLaunch": "YZZO está rodando na bandeja do sistema. Clique no ícone para abrir."
-  },
-  "dialog": {
-    "cancel": "Voltar"
   }
 }

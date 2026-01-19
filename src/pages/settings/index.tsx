@@ -16,21 +16,26 @@ const Settings = () => {
   }, []);
 
   const handleClearHistory = async () => {
-    const confirmed = await ask(t("common.settings.clearHistoryConfirm"), {
-      title: t("common.settings.clearHistory"),
-      kind: "warning",
-    });
+    const confirmed = await ask(
+      t("common.settings.clearHistory.dialog.description"),
+      {
+        title: t("common.settings.clearHistory.dialog.title"),
+        kind: "warning",
+        okLabel: t("common.settings.clearHistory.dialog.okLabel"),
+        cancelLabel: t("common.settings.clearHistory.dialog.cancelLabel"),
+      },
+    );
     if (confirmed) {
       await clearAllItems();
     }
   };
 
   const handleQuit = async () => {
-    const confirmed = await ask(t("common.settings.quitConfirm"), {
-      title: t("common.settings.quit"),
+    const confirmed = await ask(t("common.settings.quit.dialog.description"), {
+      title: t("common.settings.quit.dialog.title"),
       kind: "warning",
-      okLabel: t("common.settings.quit"),
-      cancelLabel: t("common.dialog.cancel"),
+      okLabel: t("common.settings.quit.dialog.okLabel"),
+      cancelLabel: t("common.settings.quit.dialog.cancelLabel"),
     });
     if (confirmed) {
       await exit(0);
@@ -66,7 +71,7 @@ const Settings = () => {
           <Button
             variant="danger"
             onClick={handleClearHistory}
-            label={t("common.settings.clearHistory")}
+            label={t("common.settings.clearHistory.label")}
           />
         </div>
         <div
@@ -75,7 +80,7 @@ const Settings = () => {
           <Button
             variant="danger"
             onClick={handleQuit}
-            label={t("common.settings.quit")}
+            label={t("common.settings.quit.label")}
           />
         </div>
       </div>
