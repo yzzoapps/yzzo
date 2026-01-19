@@ -24,7 +24,9 @@ const About: React.FC = () => {
             <img src="/icon.svg" alt="Logo" className="h-full w-auto" />
             <img src="/text.svg" alt="Logo" className="h-6 w-auto" />
           </div>
-          <p className="text-neutral-black dark:text-gray-400">v{version}</p>
+          <p className="text-gray-500 dark:text-gray-400 font-light">
+            v{version}
+          </p>
         </div>
 
         <p className={descriptionStyle}>
