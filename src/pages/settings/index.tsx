@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Header, SettingsItem } from "@yzzo/components";
 import { clearAllItems } from "@yzzo/api/tauriApi";
 import { getVersion } from "@tauri-apps/api/app";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +15,11 @@ const Settings = () => {
   }, []);
 
   const handleClearHistory = async () => {
-    if (window.confirm(t("common.settings.clearHistoryConfirm"))) {
+    const confirmed = await ask(t("common.settings.clearHistoryConfirm"), {
+      title: t("common.settings.clearHistory"),
+      kind: "warning",
+    });
+    if (confirmed) {
       await clearAllItems();
     }
   };
