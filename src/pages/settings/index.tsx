@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Header, SettingsItem } from "@yzzo/components";
 import { clearAllItems } from "@yzzo/api/tauriApi";
 import { getVersion } from "@tauri-apps/api/app";
+import { exit } from "@tauri-apps/plugin-process";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { BORDER_BOTTOM } from "@yzzo/styles/constants";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,18 @@ const Settings = () => {
     });
     if (confirmed) {
       await clearAllItems();
+    }
+  };
+
+  const handleQuit = async () => {
+    const confirmed = await ask(t("common.settings.quitConfirm"), {
+      title: t("common.settings.quit"),
+      kind: "warning",
+      okLabel: t("common.settings.quit"),
+      cancelLabel: t("common.dialog.cancel"),
+    });
+    if (confirmed) {
+      await exit(0);
     }
   };
 
@@ -53,6 +66,15 @@ const Settings = () => {
           variant="danger"
           onClick={handleClearHistory}
           label={t("common.settings.clearHistory")}
+        />
+      </div>
+      <div
+        className={`px-4 py-2 ${BORDER_BOTTOM} items-center justify-center flex`}
+      >
+        <Button
+          variant="danger"
+          onClick={handleQuit}
+          label={t("common.settings.quit")}
         />
       </div>
     </>

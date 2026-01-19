@@ -7,6 +7,14 @@
     "privacy": "Privacy",
     "about": "About",
     "clearHistory": "Clear clipboard history",
-    "clearHistoryConfirm": "Are you sure you want to clear all clipboard history? This action cannot be undone."
+    "clearHistoryConfirm": "Are you sure you want to clear all clipboard history? This action cannot be undone.",
+    "quit": "Quit",
+    "quitConfirm": "Are you sure you want to quit YZZO?"
+  },
+  "notifications": {
+    "firstLaunch": "YZZO is running in the system tray. Click the tray icon to open."
+  },
+  "dialog": {
+    "cancel": "No, go back"
   }
 }

@@ -1,9 +1,19 @@
 use crate::state::AppState;
 use crate::{HOLD_BEHAVIOR, state::DbPool};
+use std::panic;
 use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Manager, State};
-
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+use tauri_plugin_positioner::{Position, WindowExt};
+
+pub fn move_to_tray_or_center<W: WindowExt>(window: &W) {
+    let result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        window.move_window(Position::TrayBottomCenter)
+    }));
+    if result.is_err() || result.unwrap().is_err() {
+        let _ = window.move_window(Position::Center);
+    }
+}
 
 #[cfg(target_os = "macos")]
 pub const DEFAULT_HOTKEY: &str = "Cmd+`";
@@ -30,6 +40,7 @@ pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<()
                     match event.state() {
                         ShortcutState::Pressed => {
                             let _ = window.unminimize();
+                            move_to_tray_or_center(&window);
                             let _ = window.show();
                             let _ = window.set_focus();
                         }
@@ -44,6 +55,7 @@ pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<()
                                 let _ = window.hide();
                             } else {
                                 let _ = window.unminimize();
+                                move_to_tray_or_center(&window);
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }

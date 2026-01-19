@@ -13,7 +13,7 @@ mod db;
 mod models;
 mod state;
 
-use commands::hotkeys::{DEFAULT_HOTKEY, get_hotkey, parse_hotkey};
+use commands::hotkeys::{DEFAULT_HOTKEY, get_hotkey, move_to_tray_or_center, parse_hotkey};
 use commands::{hotkeys, items};
 use db::setup_db;
 use state::AppState;
@@ -39,6 +39,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             items::get_items,
@@ -106,12 +108,8 @@ pub fn run() {
                                                 let _ = window.hide();
                                             } else {
                                                 let _ = window.unminimize();
+                                                let _ = move_to_tray_or_center(&window);
                                                 let _ = window.show();
-                                                #[cfg(target_os = "macos")]
-                                                {
-                                                    let _ =
-                                                        window.move_window(Position::TrayCenter);
-                                                }
                                                 let _ = window.set_focus();
                                             }
                                         }
@@ -153,7 +151,10 @@ pub fn run() {
                             width: 800,
                             height: 600,
                         }));
+                        let _ = window.skip_taskbar(true);
                         let _ = window.set_resizable(true);
+                        // try tray position, fall back to center
+                        move_to_tray_or_center(&window);
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
@@ -168,5 +169,15 @@ pub fn run() {
     #[cfg(target_os = "macos")]
     app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-    app.run(|_app_handle, _event| {});
+    app.run(|app_handle, event| {
+        #[cfg(target_os = "macos")]
+        if let tauri::RunEvent::Reopen { .. } = event {
+            if let Some(window) = app_handle.get_webview_window("main") {
+                let _ = window.unminimize();
+                move_to_tray_or_center(&window);
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }
+    });
 }
