@@ -25,6 +25,21 @@ mock.module("@yzzo/api/tauriApi", () => ({
   clearAllItems: mock(() => Promise.resolve()),
 }));
 
+mock.module("@tauri-apps/api/app", () => ({
+  getVersion: mock(() => Promise.resolve("1.0.0")),
+}));
+
+const mockAsk = mock(() => Promise.resolve(true));
+const mockExit = mock(() => Promise.resolve());
+
+mock.module("@tauri-apps/plugin-dialog", () => ({
+  ask: mockAsk,
+}));
+
+mock.module("@tauri-apps/plugin-process", () => ({
+  exit: mockExit,
+}));
+
 describe("Home page", () => {
   describe("Structure", () => {
     beforeEach(() => {
@@ -62,6 +77,9 @@ describe("Home page", () => {
           "common.settings.about",
           "common.settings.clearHistory",
           "common.settings.clearHistoryConfirm",
+          "common.settings.quit",
+          "common.settings.quitConfirm",
+          "common.dialog.cancel",
         ];
 
         keysToCheck.forEach((key) => {
@@ -78,6 +96,9 @@ describe("Home page", () => {
           "common.settings.about",
           "common.settings.clearHistory",
           "common.settings.clearHistoryConfirm",
+          "common.settings.quit",
+          "common.settings.quitConfirm",
+          "common.dialog.cancel",
         ];
 
         keysToCheck.forEach((key) => {
@@ -246,6 +267,7 @@ describe("Home page", () => {
   describe("Clear History Button", () => {
     beforeEach(() => {
       setupI18nMock("en");
+      mockAsk.mockClear();
     });
 
     test("should call clearAllItems when confirmed", async () => {
@@ -253,7 +275,7 @@ describe("Home page", () => {
         tauriApi,
         "clearAllItems",
       ).mockResolvedValue(undefined);
-      const confirmSpy = spyOn(window, "confirm").mockReturnValue(true);
+      mockAsk.mockResolvedValue(true);
 
       const { container } = render(<Settings />);
 
@@ -265,11 +287,10 @@ describe("Home page", () => {
       });
 
       await waitFor(() => {
-        expect(confirmSpy).toHaveBeenCalled();
+        expect(mockAsk).toHaveBeenCalled();
         expect(clearAllItemsSpy).toHaveBeenCalled();
       });
 
-      confirmSpy.mockRestore();
       clearAllItemsSpy.mockRestore();
     });
 
@@ -278,7 +299,7 @@ describe("Home page", () => {
         tauriApi,
         "clearAllItems",
       ).mockResolvedValue(undefined);
-      const confirmSpy = spyOn(window, "confirm").mockReturnValue(false);
+      mockAsk.mockResolvedValue(false);
 
       const { container } = render(<Settings />);
 
@@ -290,16 +311,15 @@ describe("Home page", () => {
       });
 
       await waitFor(() => {
-        expect(confirmSpy).toHaveBeenCalled();
+        expect(mockAsk).toHaveBeenCalled();
         expect(clearAllItemsSpy).not.toHaveBeenCalled();
       });
 
-      confirmSpy.mockRestore();
       clearAllItemsSpy.mockRestore();
     });
 
     test("should show confirmation dialog with correct message", async () => {
-      const confirmSpy = spyOn(window, "confirm").mockReturnValue(false);
+      mockAsk.mockResolvedValue(false);
 
       const { container } = render(<Settings />);
 
@@ -311,12 +331,87 @@ describe("Home page", () => {
       });
 
       await waitFor(() => {
-        expect(confirmSpy).toHaveBeenCalledWith(
+        expect(mockAsk).toHaveBeenCalledWith(
           "Are you sure you want to clear all clipboard history? This action cannot be undone.",
+          {
+            title: "Clear clipboard history",
+            kind: "warning",
+          },
         );
       });
+    });
+  });
 
-      confirmSpy.mockRestore();
+  describe("Quit Button", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+      mockAsk.mockClear();
+      mockExit.mockClear();
+    });
+
+    test("should render quit button", async () => {
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const quitButton = within(container).getByText("Quit");
+        expect(quitButton).toBeInTheDocument();
+        expect(quitButton.tagName).toBe("BUTTON");
+      });
+    });
+
+    test("should call exit when confirmed", async () => {
+      mockAsk.mockResolvedValue(true);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const quitButton = within(container).getByText("Quit");
+        fireEvent.click(quitButton);
+      });
+
+      await waitFor(() => {
+        expect(mockAsk).toHaveBeenCalled();
+        expect(mockExit).toHaveBeenCalledWith(0);
+      });
+    });
+
+    test("should not call exit when cancelled", async () => {
+      mockAsk.mockResolvedValue(false);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const quitButton = within(container).getByText("Quit");
+        fireEvent.click(quitButton);
+      });
+
+      await waitFor(() => {
+        expect(mockAsk).toHaveBeenCalled();
+        expect(mockExit).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should show confirmation dialog with correct options", async () => {
+      mockAsk.mockResolvedValue(false);
+
+      const { container } = render(<Settings />);
+
+      await waitFor(() => {
+        const quitButton = within(container).getByText("Quit");
+        fireEvent.click(quitButton);
+      });
+
+      await waitFor(() => {
+        expect(mockAsk).toHaveBeenCalledWith(
+          "Are you sure you want to quit YZZO?",
+          {
+            title: "Quit",
+            kind: "warning",
+            okLabel: "Quit",
+            cancelLabel: "No, go back",
+          },
+        );
+      });
     });
   });
 });
