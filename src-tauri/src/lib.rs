@@ -141,7 +141,6 @@ pub fn run() {
                         width: 340.0,
                         height: 560.0,
                     }));
-                    let _ = window.set_minimizable(true);
 
                     #[cfg(target_os = "macos")]
                     {

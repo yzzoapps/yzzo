@@ -23,7 +23,7 @@
         "visible": false,
         "resizable": true,
         "minimizable": true,
-        "maximizable": false,
+        "maximizable": true,
         "closable": true
       }
     ],
