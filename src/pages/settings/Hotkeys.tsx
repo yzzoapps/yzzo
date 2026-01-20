@@ -90,7 +90,7 @@ const Hotkeys: React.FC = () => {
       />
 
       <div className="flex flex-col gap-4 p-4">
-        <div>
+        <div className="w-full max-w-[308px]">
           <Label label={t("components.settings.hotkey.title")} />
           <div className="flex flex-row w-full">
             <Input
@@ -101,12 +101,12 @@ const Hotkeys: React.FC = () => {
                     t("components.settings.hotkey.listeningPlaceholder")
                   : hotkey
               }
+              className="flex-1"
               attachedToButton
             />
             <Button
               variant={isListening ? "danger" : "default"}
               onClick={handleChangeHotkey}
-              className="w-auto"
               label={
                 isListening ? "Cancel" : t("components.settings.hotkey.change")
               }

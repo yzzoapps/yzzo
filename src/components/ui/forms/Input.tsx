@@ -27,7 +27,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className="flex flex-col gap-1">
+      <div className={`flex flex-col gap-1 ${className}`}>
         {label && <Label label={label} />}
         <input
           ref={ref}
@@ -38,8 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           placeholder={placeholder}
           className={`w-full min-w-0 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded text-sm h-10 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent
             ${readOnly ? "bg-neutral-200 dark:bg-neutral-black/10 text-neutral-600 dark:text-neutral-400 cursor-not-allowed" : "bg-white dark:bg-neutral-black/10 dark:text-neutral-white"}
-            ${attachedToButton ? "rounded-r-none" : ""}
-            ${className}`}
+            ${attachedToButton ? "rounded-r-none" : ""}`}
         />
         {helperText && <HelperText text={helperText} />}
       </div>
