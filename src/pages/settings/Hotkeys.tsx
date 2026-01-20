@@ -95,7 +95,10 @@ const Hotkeys: React.FC = () => {
 
       <div className="flex flex-col gap-4 p-4">
         <div className="w-full max-w-80">
-          <Label label={t("components.settings.hotkey.title")} />
+          <Label
+            label={t("components.settings.hotkey.title")}
+            className="mb-1"
+          />
           <div className="flex flex-row w-full">
             <Input
               readOnly
