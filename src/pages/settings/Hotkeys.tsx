@@ -45,17 +45,24 @@ const Hotkeys: React.FC = () => {
     if (!isListening) return;
     event.preventDefault();
 
-    // save when all keys are released AND we have at least one key recorded
-    if (!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
-      if (currentCombination) {
-        const finalCombo = currentCombination.replace("+...", "");
+    // check if a non-modifier key was released (the main key of the combo)
+    const isModifierKey = ["Control", "Alt", "Shift", "Meta"].includes(
+      event.key,
+    );
 
-        setIsListening(false);
-        updateHotkey(finalCombo).catch((error) => {
-          alert("Failed to save hotkey: " + error);
-        });
-        setCurrentCombination("");
-      }
+    if (
+      !isModifierKey &&
+      currentCombination &&
+      !currentCombination.endsWith("...")
+    ) {
+      // a main key was released, save the combination
+      const finalCombo = currentCombination.replace("+...", "");
+
+      setIsListening(false);
+      updateHotkey(finalCombo).catch((error) => {
+        alert("Failed to save hotkey: " + error);
+      });
+      setCurrentCombination("");
     }
   };
 

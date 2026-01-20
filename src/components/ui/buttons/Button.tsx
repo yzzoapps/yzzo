@@ -15,6 +15,7 @@ const buttonStyles = {
   variants: {
     default: "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-700",
     danger: "text-red-500 hover:text-red-700 dark:hover:text-red-300 p-0!",
+    dangerAttached: "bg-red-600 text-white hover:bg-red-700 active:bg-red-700",
     disabled: "bg-neutral-500 text-white cursor-not-allowed",
   },
   sizes: {
@@ -33,6 +34,14 @@ const Button: React.FC<ButtonProps> = ({
   attachedToInput = false,
   className = "",
 }) => {
+  const getVariantStyle = () => {
+    if (disabled) return buttonStyles.variants.disabled;
+    if (variant === "danger" && attachedToInput) {
+      return buttonStyles.variants.dangerAttached;
+    }
+    return buttonStyles.variants[variant];
+  };
+
   return (
     <button
       onClick={onClick}
@@ -40,7 +49,7 @@ const Button: React.FC<ButtonProps> = ({
       className={`
         ${buttonStyles.base}
         ${buttonStyles.sizes[size]}
-        ${disabled ? buttonStyles.variants.disabled : buttonStyles.variants[variant]}
+        ${getVariantStyle()}
         ${attachedToInput ? "rounded-l-none" : ""}
         ${className}
       `}
