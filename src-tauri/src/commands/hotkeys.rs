@@ -2,7 +2,7 @@ use crate::state::AppState;
 use crate::{HOLD_BEHAVIOR, state::DbPool};
 use std::panic;
 use std::sync::atomic::Ordering;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -45,6 +45,7 @@ pub fn register_hotkey_handler(app: &AppHandle, shortcut: Shortcut) -> Result<()
                             let _ = window.set_focus();
                         }
                         ShortcutState::Released => {
+                            let _ = window.emit("hotkey-released", ());
                             let _ = window.hide();
                         }
                     }

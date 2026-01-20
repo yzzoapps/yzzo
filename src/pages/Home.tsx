@@ -39,6 +39,38 @@ const Home = () => {
     return item.content.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
+  // Keep refs updated for use in event listeners
+  const filteredItemsRef = useRef(filteredItems);
+  const selectedIndexRef = useRef(selectedIndex);
+  useEffect(() => {
+    filteredItemsRef.current = filteredItems;
+    selectedIndexRef.current = selectedIndex;
+  }, [filteredItems, selectedIndex]);
+
+  // Copy selected item to clipboard and reset state
+  const copySelectedItem = async () => {
+    const currentFilteredItems = filteredItemsRef.current;
+    const currentSelectedIndex = selectedIndexRef.current;
+
+    if (currentSelectedIndex === null || currentFilteredItems.length === 0) {
+      return;
+    }
+
+    const selectedItem = currentFilteredItems[currentSelectedIndex];
+    if (!selectedItem) return;
+
+    await bumpItem(selectedItem.id);
+
+    if (selectedItem.item_type === "image" && selectedItem.file_path) {
+      await writeImageToClipboard(selectedItem.file_path);
+    } else {
+      await writeText(selectedItem.content);
+    }
+
+    setSearchQuery("");
+    searchInputRef.current?.blur();
+  };
+
   useEffect(() => {
     selectedItemRef.current?.scrollIntoView({
       behavior: "instant",
@@ -69,24 +101,11 @@ const Home = () => {
         selectedIndex !== null
       ) {
         e.preventDefault();
-        const selectedItem = filteredItems[selectedIndex];
-        if (selectedItem) {
-          await bumpItem(selectedItem.id);
-
-          if (selectedItem.item_type === "image" && selectedItem.file_path) {
-            await writeImageToClipboard(selectedItem.file_path);
-          } else {
-            await writeText(selectedItem.content);
-          }
-
-          setSearchQuery("");
-          searchInputRef.current?.blur();
-
-          try {
-            await hideWindow();
-          } catch (error) {
-            console.error("Failed to hide window:", error);
-          }
+        await copySelectedItem();
+        try {
+          await hideWindow();
+        } catch (error) {
+          console.error("Failed to hide window:", error);
         }
         return;
       }
@@ -127,6 +146,17 @@ const Home = () => {
   useEffect(() => {
     const unlisten = listen("clipboard-changed", () => {
       setRefreshTrigger((prev) => prev + 1);
+    });
+
+    return () => {
+      unlisten.then((f) => f());
+    };
+  }, []);
+
+  // listen for hotkey release (hold-to-show mode) to copy selected item
+  useEffect(() => {
+    const unlisten = listen("hotkey-released", () => {
+      copySelectedItem();
     });
 
     return () => {
