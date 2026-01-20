@@ -174,8 +174,11 @@ const Home = () => {
     }
   }, [refreshTrigger]);
 
+  // /when i navigate with arrow keys down to the bottom of the list, the header gets pushed to the top
+  // The issue is that `scrollIntoView` with `block: "nearest"` can still cause the parent containers to scroll. We need to use a ref for the scroll container and manually scroll within it instead.
+  //
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <Header type="primary" />
       <div className={`px-4 py-2 ${BORDER_BOTTOM}`}>
         <Input
