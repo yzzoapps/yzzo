@@ -9,6 +9,17 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 
+const isMacOS = navigator.platform.toLowerCase().includes("mac");
+
+const hideWindow = async () => {
+  const window = getCurrentWindow();
+  if (isMacOS) {
+    await window.hide();
+  } else {
+    await window.minimize();
+  }
+};
+
 const Home = () => {
   const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
@@ -72,7 +83,7 @@ const Home = () => {
           searchInputRef.current?.blur();
 
           try {
-            await getCurrentWindow().minimize();
+            await hideWindow();
           } catch (error) {
             console.error("Failed to hide window:", error);
           }
@@ -178,7 +189,7 @@ const Home = () => {
                   searchInputRef.current?.blur();
 
                   try {
-                    await getCurrentWindow().minimize();
+                    await hideWindow();
                   } catch (error) {
                     console.error("Failed to hide window:", error);
                   }
