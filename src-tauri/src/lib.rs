@@ -91,6 +91,7 @@ pub fn run() {
                 // tray icon setup
                 if let Some(icon) = app.default_window_icon() {
                     if let Err(e) = TrayIconBuilder::new()
+                        .icon_as_template(false)
                         .icon(icon.clone())
                         .on_tray_icon_event(|tray, event| {
                             tauri_plugin_positioner::on_tray_event(tray.app_handle(), &event);

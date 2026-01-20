@@ -10,10 +10,6 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "trayIcon": {
-      "iconAsTemplate": false,
-      "iconPath": "icons/icon.png"
-    },
     "windows": [
       {
         "label": "main",
@@ -33,7 +29,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["deb", "rpm", "dmg", "app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
