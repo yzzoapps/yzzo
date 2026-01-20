@@ -31,9 +31,23 @@ mock.module("@tauri-apps/api/window", () => ({
   }),
 }));
 
+// store event listeners for testing
+const eventListeners: Record<string, (payload?: any) => void> = {};
+
 mock.module("@tauri-apps/api/event", () => ({
-  listen: () => Promise.resolve(() => {}),
+  listen: (event: string, callback: (payload?: any) => void) => {
+    eventListeners[event] = callback;
+    return Promise.resolve(() => {
+      delete eventListeners[event];
+    });
+  },
 }));
+
+const emitEvent = (event: string, payload?: any) => {
+  if (eventListeners[event]) {
+    eventListeners[event](payload);
+  }
+};
 
 mock.module("@yzzo/components/home/ImagePreview", () => ({
   default: ({ filePath }: any) => (
@@ -1221,6 +1235,204 @@ describe("Home page", () => {
         );
         expect(mockWriteText).not.toHaveBeenCalled();
         expect(mockBumpItem).toHaveBeenCalledWith(2);
+      });
+    });
+  });
+
+  describe("Hold-to-show behavior (hotkey-released event)", () => {
+    beforeEach(() => {
+      setupI18nMock("en");
+      mockGetItems.mockClear();
+      mockBumpItem.mockClear();
+      mockWriteText.mockClear();
+      mockWriteImageToClipboard.mockClear();
+      mockMinimize.mockClear();
+      // Clear event listeners
+      Object.keys(eventListeners).forEach((key) => delete eventListeners[key]);
+    });
+
+    test("should copy selected text item when hotkey-released event is emitted", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+        expect(within(container).getByText("Second item")).toBeInTheDocument();
+      });
+
+      // Select second item using keyboard
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[1]).toHaveClass("bg-secondary/10");
+      });
+
+      // Emit hotkey-released event (simulating user releasing the hold-to-show hotkey)
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(2);
+        expect(mockWriteText).toHaveBeenCalledWith("Second item");
+      });
+    });
+
+    test("should copy selected image item when hotkey-released event is emitted", async () => {
+      const mockItems: Item[] = [
+        {
+          id: 1,
+          content: "screenshot.png",
+          item_type: "image",
+          file_path: "/path/to/screenshot.png",
+        },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(
+          within(container).getByTestId("image-preview"),
+        ).toBeInTheDocument();
+      });
+
+      // Select the image item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // Emit hotkey-released event
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+        expect(mockWriteImageToClipboard).toHaveBeenCalledWith(
+          "/path/to/screenshot.png",
+        );
+        expect(mockWriteText).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should not copy anything when hotkey-released with no item selected", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      // Don't select any item, just emit the event
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).not.toHaveBeenCalled();
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockWriteImageToClipboard).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should not copy anything when hotkey-released with empty items list", async () => {
+      mockGetItems.mockResolvedValue([]);
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(mockGetItems).toHaveBeenCalled();
+      });
+
+      // Emit hotkey-released event with no items
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).not.toHaveBeenCalled();
+        expect(mockWriteText).not.toHaveBeenCalled();
+        expect(mockWriteImageToClipboard).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should copy item selected via mouse click when hotkey-released", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "First item", item_type: "text" },
+        { id: 2, content: "Second item", item_type: "text" },
+        { id: 3, content: "Third item", item_type: "text" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("First item")).toBeInTheDocument();
+      });
+
+      const listItems = within(container).getAllByRole("listitem");
+
+      // Select third item via mouse click
+      fireEvent.click(listItems[2]);
+
+      await waitFor(() => {
+        expect(listItems[2]).toHaveClass("bg-secondary/10");
+      });
+
+      // Emit hotkey-released event
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(3);
+        expect(mockWriteText).toHaveBeenCalledWith("Third item");
+      });
+    });
+
+    test("should reset search query after hotkey-released copies item", async () => {
+      const mockItems: Item[] = [
+        { id: 1, content: "Apple", item_type: "text" },
+        { id: 2, content: "Banana", item_type: "text" },
+      ];
+
+      mockGetItems.mockResolvedValue(mockItems);
+      const { container } = render(<Home />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Apple")).toBeInTheDocument();
+      });
+
+      // Type in search
+      const searchInput = within(container).getByRole(
+        "textbox",
+      ) as HTMLInputElement;
+      fireEvent.change(searchInput, { target: { value: "App" } });
+
+      await waitFor(() => {
+        expect(searchInput.value).toBe("App");
+      });
+
+      // Select the filtered item
+      fireEvent.keyDown(window, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        const listItems = within(container).getAllByRole("listitem");
+        expect(listItems[0]).toHaveClass("bg-secondary/10");
+      });
+
+      // Emit hotkey-released event
+      emitEvent("hotkey-released");
+
+      await waitFor(() => {
+        expect(mockBumpItem).toHaveBeenCalledWith(1);
+        expect(mockWriteText).toHaveBeenCalledWith("Apple");
+        expect(searchInput.value).toBe("");
       });
     });
   });
