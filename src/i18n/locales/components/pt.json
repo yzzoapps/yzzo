@@ -11,6 +11,7 @@
       "listeningPlaceholder": "Pressione as teclas...",
       "helperText": "Pressione este atalho para abrir o aplicativo.",
       "change": "Alterar",
+      "cancel": "Cancelar",
       "behavior": "Comportamento do atalho global",
       "behaviorToggle": "Pressionar para abrir/fechar",
       "behaviorHold": "Manter pressionado para exibir"
