@@ -122,7 +122,9 @@ const Hotkeys: React.FC = () => {
               variant={isListening ? "danger" : "default"}
               onClick={handleChangeHotkey}
               label={
-                isListening ? "Cancel" : t("components.settings.hotkey.change")
+                isListening
+                  ? t("components.settings.hotkey.cancel")
+                  : t("components.settings.hotkey.change")
               }
               attachedToInput
             />

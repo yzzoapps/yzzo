@@ -11,6 +11,7 @@
       "listeningPlaceholder": "Press keys...",
       "helperText": "Use this hotkey to open the app.",
       "change": "Change",
+      "cancel": "Cancel",
       "behavior": "Global hotkey behavior",
       "behaviorToggle": "Press to open/close",
       "behaviorHold": "Hold to show"
