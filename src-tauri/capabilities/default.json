@@ -6,6 +6,7 @@
   "permissions": [
     "core:default",
     "core:window:allow-minimize",
+    "core:window:allow-hide",
     "opener:default",
     "clipboard-manager:default",
     "clipboard-manager:allow-read-image",
