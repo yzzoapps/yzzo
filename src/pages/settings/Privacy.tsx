@@ -19,19 +19,19 @@ const Privacy: React.FC = () => {
       <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-4">
         <section>
           <h2 className={headerStyle}>
-            {t("components.settings.privacy.dataStorage")}
+            {t("components.settings.privacy.noCollection")}
           </h2>
           <p className={descriptionStyle}>
-            {t("components.settings.privacy.dataStorageDescription")}
+            {t("components.settings.privacy.noCollectionDescription")}
           </p>
         </section>
 
         <section>
           <h2 className={headerStyle}>
-            {t("components.settings.privacy.noCollection")}
+            {t("components.settings.privacy.dataStorage")}
           </h2>
           <p className={descriptionStyle}>
-            {t("components.settings.privacy.noCollectionDescription")}
+            {t("components.settings.privacy.dataStorageDescription")}
           </p>
         </section>
 
