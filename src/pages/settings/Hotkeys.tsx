@@ -4,8 +4,6 @@ import { Button, Header, Input, Label, Radio } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
 import type { HotkeyBehavior } from "@yzzo/types";
 
-const isMacOS = navigator.platform.toLowerCase().includes("mac");
-
 const behaviorOptions: { value: HotkeyBehavior; labelKey: string }[] = [
   { value: "toggle", labelKey: "components.settings.hotkey.behaviorToggle" },
   { value: "hold", labelKey: "components.settings.hotkey.behaviorHold" },
@@ -123,14 +121,12 @@ const Hotkeys: React.FC = () => {
             {t("components.settings.hotkey.helperText")}
           </p>
         </div>
-        {isMacOS && (
-          <Radio<HotkeyBehavior>
-            label={t("components.settings.hotkey.behavior")}
-            selectedValue={holdBehavior ? "hold" : "toggle"}
-            options={behaviorOptions}
-            onChange={(value) => handleHoldBehaviorToggle(value === "hold")}
-          />
-        )}
+        <Radio<HotkeyBehavior>
+          label={t("components.settings.hotkey.behavior")}
+          selectedValue={holdBehavior ? "hold" : "toggle"}
+          options={behaviorOptions}
+          onChange={(value) => handleHoldBehaviorToggle(value === "hold")}
+        />
       </div>
     </div>
   );
