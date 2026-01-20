@@ -142,7 +142,7 @@ const Home = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("components.home.searchPlaceholder")}
-          className="rounded-full"
+          rounded="rounded-full"
         />
       </div>
       <div
