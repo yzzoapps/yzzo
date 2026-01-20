@@ -30,7 +30,7 @@
       "dataStorage": "Data storage",
       "dataStorageDescription": "All your clipboard history is stored locally on your device in a SQLite database. Your data never leaves your computer. That also means that there is not synchronization with other devices.",
       "noCollection": "Data collection",
-      "noCollectionDescription": "YZZO is completely offline. We do not collect any analytics, telemetry, or usage data. There are no network requests made by the app.",
+      "noCollectionDescription": "We do not collect any analytics, telemetry, or usage data.",
       "imageStorage": "Image storage",
       "imageStorageDescription": "Copied images are saved locally in your app data folder. They are only accessible by this application.",
       "feedback": "Feedback and requests",

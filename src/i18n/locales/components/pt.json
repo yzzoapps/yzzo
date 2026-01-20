@@ -30,7 +30,7 @@
       "dataStorage": "Armazenamento de dados",
       "dataStorageDescription": "Todo o histórico da sua área de transferência é armazenado localmente no seu dispositivo em um banco de dados SQLite. Seus dados nunca saem do seu computador. Isso também significa que não há sincronização com outros dispositivos.",
       "noCollection": "Coleta de dados",
-      "noCollectionDescription": "YZZO é completamente offline. Não coletamos nenhum dado de análise, telemetria ou uso. Nenhuma requisição de rede é feita pelo aplicativo.",
+      "noCollectionDescription": "Não coletamos nenhum dado de análise, telemetria ou uso.",
       "imageStorage": "Armazenamento de imagens",
       "imageStorageDescription": "Imagens copiadas são salvas localmente na pasta de dados do aplicativo. Elas são acessíveis apenas por este aplicativo.",
       "feedback": "Feedback e solicitações",
