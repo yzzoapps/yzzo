@@ -7,7 +7,7 @@ A modern clipboard manager built for simplicity and productivity. YZZO is comple
 ## Privacy first
 
 - **No data collection**: YZZO does not collect, transmit, or share any of your data.
-- **Local storage only**: All clipboard history is stored locally on your device using SQLite
+- **Local storage only**: All clipboard history is stored locally on your device using SQLite.
 - **Complete privacy**: Your clipboard data never leaves your computer.
 
 ## Prerequisites
