@@ -11,7 +11,9 @@
       "listeningPlaceholder": "Press keys...",
       "helperText": "Use this hotkey to open the app.",
       "change": "Change",
-      "behavior": "Hotkey behavior"
+      "behavior": "Global hotkey behavior",
+      "behaviorToggle": "Press to open/close",
+      "behaviorHold": "Hold to show"
     },
     "preferences": {
       "theme": "Theme",

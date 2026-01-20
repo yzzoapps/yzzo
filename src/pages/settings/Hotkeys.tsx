@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useGlobalHotkey } from "@yzzo/hooks";
-import { Button, Header, Input, Label } from "@yzzo/components";
+import { Button, Header, Input, Label, Radio } from "@yzzo/components";
 import { useTranslation } from "react-i18next";
+import type { HotkeyBehavior } from "@yzzo/types";
 
 const isMacOS = navigator.platform.toLowerCase().includes("mac");
+
+const behaviorOptions: { value: HotkeyBehavior; labelKey: string }[] = [
+  { value: "toggle", labelKey: "components.settings.hotkey.behaviorToggle" },
+  { value: "hold", labelKey: "components.settings.hotkey.behaviorHold" },
+];
 
 const Hotkeys: React.FC = () => {
   const { hotkey, holdBehavior, isLoading, updateHotkey, updateHoldBehavior } =
@@ -90,7 +96,7 @@ const Hotkeys: React.FC = () => {
       />
 
       <div className="flex flex-col gap-4 p-4">
-        <div className="w-full max-w-[308px]">
+        <div className="w-full max-w-80">
           <Label label={t("components.settings.hotkey.title")} />
           <div className="flex flex-row w-full">
             <Input
@@ -118,25 +124,12 @@ const Hotkeys: React.FC = () => {
           </p>
         </div>
         {isMacOS && (
-          <div className="mb-6">
-            <Label label={t("components.settings.hotkey.behavior")} />
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={holdBehavior}
-                onChange={(e) => handleHoldBehaviorToggle(e.target.checked)}
-                className="w-4 h-4 cursor-pointer"
-              />
-              <div>
-                <span className="font-medium">Hold to show</span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {holdBehavior
-                    ? "Window shows while holding hotkey, hides on release"
-                    : "Press hotkey to toggle window visibility"}
-                </p>
-              </div>
-            </label>
-          </div>
+          <Radio<HotkeyBehavior>
+            label={t("components.settings.hotkey.behavior")}
+            selectedValue={holdBehavior ? "hold" : "toggle"}
+            options={behaviorOptions}
+            onChange={(value) => handleHoldBehaviorToggle(value === "hold")}
+          />
         )}
       </div>
     </div>
