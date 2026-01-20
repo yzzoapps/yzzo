@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
-use tauri_plugin_positioner::{self};
+use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
 mod commands;
@@ -108,7 +108,17 @@ pub fn run() {
                                                 let _ = window.hide();
                                             } else {
                                                 let _ = window.unminimize();
-                                                let _ = move_to_tray_or_center(&window);
+
+                                                #[cfg(target_os = "macos")]
+                                                {
+                                                    move_to_tray_or_center(&window);
+                                                }
+
+                                                #[cfg(target_os = "linux")]
+                                                {
+                                                    let _ = window.move_window(Position::Center);
+                                                }
+
                                                 let _ = window.show();
                                                 let _ = window.set_focus();
                                             }
@@ -126,31 +136,23 @@ pub fn run() {
                     eprintln!("[X] No default window icon available for tray");
                 }
 
-                #[cfg(target_os = "macos")]
-                {
-                    // on macOS, keep window hidden - only show via tray icon click
-                    if let Some(window) = handle.get_webview_window("main") {
-                        let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize {
-                            width: 340.0,
-                            height: 560.0,
-                        }));
+                if let Some(window) = handle.get_webview_window("main") {
+                    let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize {
+                        width: 340.0,
+                        height: 560.0,
+                    }));
+                    let _ = window.set_minimizable(true);
+
+                    #[cfg(target_os = "macos")]
+                    {
                         let _ = window.set_title("YZZO - Clipboard Manager");
-                        let _ = window.set_minimizable(true);
+                        // on macOS, keep window hidden - only show via tray icon click
                         let _ = window.hide();
                     }
-                }
 
-                #[cfg(target_os = "linux")]
-                {
-                    // on Linux, show the window by default since tray behavior is unreliable
-                    if let Some(window) = handle.get_webview_window("main") {
-                        let _ = window.set_size(tauri::Size::Physical(tauri::PhysicalSize {
-                            width: 800,
-                            height: 600,
-                        }));
-                        let _ = window.skip_taskbar(true);
-                        let _ = window.set_resizable(true);
-                        move_to_tray_or_center(&window);
+                    #[cfg(target_os = "linux")]
+                    {
+                        // on Linux, show the window by default since tray behavior is unreliable
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
