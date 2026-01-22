@@ -1,6 +1,6 @@
 [package]
 name = "yzzo"
-version = "1.0.0"
+version = "1.0.1"
 description = "YZZO, a clipboard manager built for simplicity and productivity."
 authors = ["YZZO Apps"]
 edition = "2024"

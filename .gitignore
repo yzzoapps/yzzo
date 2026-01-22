@@ -24,3 +24,13 @@ dist-ssr
 *.sw?
 
 coverage
+
+# Provisioning profiles
+src-tauri/profiles/*.provisionprofile
+
+# Ignore real environment variables
+.env
+
+# Apple API Keys
+private_keys/
+*.p8

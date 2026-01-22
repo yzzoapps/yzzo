@@ -61,6 +61,12 @@ bun run tauri build
 
 This will create optimized binaries for your platform in `src-tauri/target/release`.
 
+## App Store Distribution
+
+The files in `src-tauri/` related to App Store distribution (`Entitlements.plist`, `Info.plist`, `tauri.appstore.conf.json`) contain placeholder values. **You do not need to modify these files to build and run the app locally.**
+
+Official App Store distribution is handled by the maintainer. If you wish to distribute your own version under the [LICENSE](LICENSE), follow the official [Tauri documentation](https://tauri.app/distribute/app-store/#setting-up).
+
 ## Feedback and bug reports
 
 Have feedback, found a bug, or want to request a feature? Please [open an issue on GitHub](https://github.com/yzzoapps/yzzo/issues).
