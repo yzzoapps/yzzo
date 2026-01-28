@@ -5,6 +5,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_clipboard_manager;
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_positioner::{self, Position, WindowExt};
 
 mod clipboard_watcher;
@@ -19,6 +20,16 @@ use db::setup_db;
 use state::AppState;
 
 pub static HOLD_BEHAVIOR: AtomicBool = AtomicBool::new(false);
+
+fn show_error_and_exit(app: &tauri::AppHandle, title: &str, message: &str) -> ! {
+    eprintln!("[X] {}: {}", title, message);
+    app.dialog()
+        .message(message)
+        .title(title)
+        .kind(MessageDialogKind::Error)
+        .blocking_show();
+    std::process::exit(1);
+}
 
 pub fn run() {
     let mut app = tauri::Builder::default()
@@ -61,7 +72,16 @@ pub fn run() {
                 let handle = app.handle().clone();
 
                 tauri::async_runtime::block_on(async {
-                    let db = setup_db(&handle).await;
+                    let db = match setup_db(&handle).await {
+                        Ok(db) => db,
+                        Err(e) => {
+                            show_error_and_exit(
+                                &handle,
+                                "Database Error",
+                                &format!("{}\n\nThe application cannot start.", e),
+                            );
+                        }
+                    };
 
                     let hold_behavior = hotkeys::load_hold_behavior_from_db(&db).await;
                     HOLD_BEHAVIOR.store(hold_behavior, Ordering::Relaxed);
@@ -69,7 +89,13 @@ pub fn run() {
                     handle.manage(AppState { db });
                 });
 
-                clipboard_watcher::start_clipboard_watcher(handle.clone());
+                if let Err(e) = clipboard_watcher::start_clipboard_watcher(handle.clone()) {
+                    show_error_and_exit(
+                        &handle,
+                        "Clipboard Error",
+                        &format!("{}\n\nThe application cannot start.", e),
+                    );
+                }
 
                 // Register global hotkey after state is managed
                 let state = handle.state::<AppState>();
