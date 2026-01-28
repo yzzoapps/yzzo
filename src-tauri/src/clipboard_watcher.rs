@@ -6,14 +6,65 @@ use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, Wry};
 
-pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
+#[derive(Debug)]
+pub enum ClipboardWatcherError {
+    ClipboardInit(String),
+    AppDataDir(String),
+    CreateImagesDir(String),
+}
+
+impl std::fmt::Display for ClipboardWatcherError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ClipboardWatcherError::ClipboardInit(e) => {
+                write!(f, "Failed to initialize clipboard: {}", e)
+            }
+            ClipboardWatcherError::AppDataDir(e) => {
+                write!(f, "Failed to get app data directory: {}", e)
+            }
+            ClipboardWatcherError::CreateImagesDir(e) => {
+                write!(f, "Failed to create images directory: {}", e)
+            }
+        }
+    }
+}
+
+pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), ClipboardWatcherError> {
+    // Validate we can get the app data directory before starting the thread
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| ClipboardWatcherError::AppDataDir(e.to_string()))?;
+
+    let images_dir = app_data_dir.join("images");
+    std::fs::create_dir_all(&images_dir).map_err(|e| {
+        ClipboardWatcherError::CreateImagesDir(format!("{}: {}", images_dir.display(), e))
+    })?;
+
+    // Verify we can actually write to the images directory
+    let test_file = images_dir.join(".write_test");
+    std::fs::write(&test_file, b"").map_err(|e| {
+        ClipboardWatcherError::CreateImagesDir(format!(
+            "Cannot write to {}: {}",
+            images_dir.display(),
+            e
+        ))
+    })?;
+    let _ = std::fs::remove_file(&test_file);
+
     let last_text = Arc::new(Mutex::new(String::new()));
     let last_text_clone = last_text.clone();
     let last_image_hash = Arc::new(Mutex::new(0u64));
     let last_image_hash_clone = last_image_hash.clone();
 
     thread::spawn(move || {
-        let mut clipboard = Clipboard::new().unwrap();
+        let mut clipboard = match Clipboard::new() {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("[X] Failed to initialize clipboard: {}", e);
+                return;
+            }
+        };
 
         loop {
             // try to get image first to avoid reading clipboard multiple times
@@ -34,14 +85,19 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
                 // only process if this is a new/different image
                 if *last_hash != current_hash {
                     *last_hash = current_hash;
-                    let app_data_dir = app_handle
-                        .path()
-                        .app_data_dir()
-                        .expect("failed to get app data directory");
+                    let app_data_dir = match app_handle.path().app_data_dir() {
+                        Ok(dir) => dir,
+                        Err(e) => {
+                            eprintln!("[X] Failed to get app data directory: {}", e);
+                            continue;
+                        }
+                    };
 
                     let images_dir = app_data_dir.join("images");
-                    std::fs::create_dir_all(&images_dir)
-                        .expect("failed to create images directory");
+                    if let Err(e) = std::fs::create_dir_all(&images_dir) {
+                        eprintln!("[X] Failed to create images directory: {}", e);
+                        continue;
+                    }
 
                     // generate unique filename using hash for consistent naming
                     let filename = format!("{}.png", current_hash);
@@ -110,4 +166,6 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) {
             thread::sleep(Duration::from_millis(200));
         }
     });
+
+    Ok(())
 }
