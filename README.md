@@ -2,7 +2,7 @@
   <img alt="YZZO Logo" src="docs/assets/yzzo-overview.png" />
   <h1><a href="https://yzzo.app">YZZO - Clipboard Manager</a></h1>
   <p>
-    A modern clipboard manager built for simplicity and productivity. Available for macOS and Linux.
+    YZZO is a clipboard manager built for simplicity and productivity. Available for macOS and Linux.
   </p>
 </div>
 
