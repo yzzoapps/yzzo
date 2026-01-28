@@ -3,62 +3,86 @@ use tauri::{AppHandle, Manager};
 
 pub type Database = Pool<Sqlite>;
 
-pub async fn setup_db(app: &AppHandle) -> Database {
+#[derive(Debug)]
+pub enum DbSetupError {
+    AppDataDir(String),
+    CreateDir(String),
+    CreateDatabase(String),
+    Connect(String),
+    Pragma(String),
+    Migration(String),
+}
+
+impl std::fmt::Display for DbSetupError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DbSetupError::AppDataDir(e) => write!(f, "Failed to get app data directory: {}", e),
+            DbSetupError::CreateDir(e) => write!(f, "Failed to create data directory: {}", e),
+            DbSetupError::CreateDatabase(e) => write!(f, "Failed to create database: {}", e),
+            DbSetupError::Connect(e) => write!(f, "Failed to connect to database: {}", e),
+            DbSetupError::Pragma(e) => write!(f, "Failed to configure database: {}", e),
+            DbSetupError::Migration(e) => write!(f, "Failed to run database migrations: {}", e),
+        }
+    }
+}
+
+pub async fn setup_db(app: &AppHandle) -> Result<Database, DbSetupError> {
     let mut path = app
         .path()
         .app_data_dir()
-        .expect("failed to get app data directory");
+        .map_err(|e: tauri::Error| DbSetupError::AppDataDir(e.to_string()))?;
 
-    std::fs::create_dir_all(&path).expect("failed to create data directory");
+    std::fs::create_dir_all(&path)
+        .map_err(|e| DbSetupError::CreateDir(format!("{}: {}", path.display(), e)))?;
 
     path.push("db.sqlite");
 
-    let db_url = format!("sqlite:{}", path.to_str().unwrap());
+    let db_url = format!("sqlite:{}", path.to_str().unwrap_or("invalid_path"));
 
     println!("[I] SQLite Database Path: {}", path.display());
 
     if !Sqlite::database_exists(&db_url).await.unwrap_or(false) {
         Sqlite::create_database(&db_url)
             .await
-            .expect("failed to create database");
+            .map_err(|e| DbSetupError::CreateDatabase(e.to_string()))?;
         println!("[V] Database created at {}", path.display());
     }
 
     let pool = SqlitePoolOptions::new()
-        .max_connections(1) // SQLite works best with single connection for desktop apps
+        .max_connections(1)
         .connect(&db_url)
         .await
-        .expect("failed to connect to sqlite");
+        .map_err(|e| DbSetupError::Connect(e.to_string()))?;
 
     // SQLite performance optimizations
-    sqlx::query("PRAGMA journal_mode = WAL;") // write-ahead logging for better concurrency
+    sqlx::query("PRAGMA journal_mode = WAL;")
         .execute(&pool)
         .await
-        .expect("failed to set WAL mode");
+        .map_err(|e| DbSetupError::Pragma(format!("WAL mode: {}", e)))?;
 
-    sqlx::query("PRAGMA synchronous = NORMAL;") // faster writes, still safe
+    sqlx::query("PRAGMA synchronous = NORMAL;")
         .execute(&pool)
         .await
-        .expect("failed to set synchronous mode");
+        .map_err(|e| DbSetupError::Pragma(format!("synchronous: {}", e)))?;
 
-    sqlx::query("PRAGMA cache_size = -64000;") // 64MB cache
+    sqlx::query("PRAGMA cache_size = -64000;")
         .execute(&pool)
         .await
-        .expect("failed to set cache size");
+        .map_err(|e| DbSetupError::Pragma(format!("cache_size: {}", e)))?;
 
-    sqlx::query("PRAGMA temp_store = MEMORY;") // store temp tables in memory
+    sqlx::query("PRAGMA temp_store = MEMORY;")
         .execute(&pool)
         .await
-        .expect("failed to set temp store");
+        .map_err(|e| DbSetupError::Pragma(format!("temp_store: {}", e)))?;
 
     println!("[I] Attempting to run migrations...");
 
-    if let Err(e) = sqlx::migrate!("./migrations").run(&pool).await {
-        println!("[X] Migration failed: {}", e);
-        panic!("Failed to run migrations");
-    } else {
-        println!("[V] Migrations applied successfully");
-    }
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .map_err(|e| DbSetupError::Migration(e.to_string()))?;
 
-    pool
+    println!("[V] Migrations applied successfully");
+
+    Ok(pool)
 }
