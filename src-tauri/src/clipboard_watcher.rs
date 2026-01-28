@@ -66,6 +66,24 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), Clipboa
             }
         };
 
+        // Initialize with current clipboard content to avoid treating
+        // pre-existing content as a new copy on first iteration
+        if let Ok(current_text) = clipboard.get_text() {
+            let mut last = last_text_clone.lock().unwrap();
+            *last = current_text;
+        }
+        if let Ok(current_image) = clipboard.get_image() {
+            let mut hasher = DefaultHasher::new();
+            current_image.bytes.hash(&mut hasher);
+            current_image.width.hash(&mut hasher);
+            current_image.height.hash(&mut hasher);
+            let mut last_hash = last_image_hash_clone.lock().unwrap();
+            *last_hash = hasher.finish();
+        }
+
+        // Wait for frontend to mount and set up event listeners
+        thread::sleep(Duration::from_millis(500));
+
         loop {
             // try to get image first to avoid reading clipboard multiple times
             let image_result = clipboard.get_image();
