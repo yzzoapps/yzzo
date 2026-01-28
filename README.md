@@ -1,11 +1,10 @@
 <div align="center">
   <img alt="YZZO Logo" src="docs/assets/yzzo-overview.png" />
   <h1><a href="https://yzzo.app">YZZO - Clipboard Manager</a></h1>
+  <p>
+    A modern clipboard manager built for simplicity and productivity. Available for macOS and Linux.
+  </p>
 </div>
-
-A modern clipboard manager built for simplicity and productivity. YZZO is completely free and open-source software.
-
-**Available for Linux and macOS only.**
 
 ## Privacy first
 
@@ -46,10 +45,6 @@ You're now ready for development!
 - **Database**: SQLite
 - **Framework**: Tauri
 
-## Development environment
-
-This app was built with [Zed](https://zed.dev) using the [Nyx theme](https://github.com/luccaromaniello/nyx), but feel free to use the code editor you wish.
-
 ## Project structure
 
 - `/src` - React frontend code
@@ -64,7 +59,7 @@ bun run tauri build
 
 This will create optimized binaries for your platform in `src-tauri/target/release`.
 
-## App Store Distribution
+## App Store distribution
 
 The files in `src-tauri/` related to App Store distribution (`Entitlements.plist`, `Info.plist`, `tauri.appstore.conf.json`) contain placeholder values. **You do not need to modify these files to build and run the app locally.**
 
@@ -79,5 +74,5 @@ Have feedback, found a bug, or want to request a feature? Please [open an issue 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 See the [LICENSE](LICENSE) file for the complete license text.
 
-## Author
-Created by [Lucca Romaniello](https://github.com/luccaromaniello).
+## Credits
+Created by [Lucca Romaniello](https://github.com/luccaromaniello), built with Zed editor using the [Nyx theme](https://github.com/luccaromaniello/nyx).
