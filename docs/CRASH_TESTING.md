@@ -75,6 +75,29 @@ Replace the macOS path with the Linux path in the commands above.
 
 ---
 
+## Clipboard Watcher Tests
+
+These tests verify that clipboard events are correctly captured on a fresh install.
+
+### First Copy After Install
+
+1. Uninstall the app and delete the app data directory:
+   ```bash
+   rm -rf ~/Library/Application\ Support/app.yzzo.yzzo
+   ```
+
+2. Build and launch the app
+
+3. Copy some text - it should appear in the clipboard history immediately
+
+4. Delete the app data directory again and relaunch
+
+5. Copy an image - it should appear in the clipboard history immediately
+
+If the first copy (text or image) doesn't appear until the second copy, there's a race condition between the clipboard watcher and the frontend event listeners.
+
+---
+
 ## Expected Behavior
 
 When any of these errors occur, the app should:
