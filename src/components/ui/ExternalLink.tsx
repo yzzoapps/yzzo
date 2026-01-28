@@ -23,7 +23,7 @@ const ExternalLink: React.FC<ExternalLinkProps> = ({
   return (
     <button
       onClick={handleClick}
-      className={`text-secondary hover:underline font-semibold hover:cursor-pointer focus:outline-none ${className}`}
+      className={`text-neutral-black underline decoration-2 decoration-accent hover:cursor-pointer focus:outline-none ${className}`}
     >
       {children}
     </button>
