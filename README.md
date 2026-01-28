@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="YZZO Logo" src="docs/assets/yzzo-overview.png" />
+  <a href="https://yzzo.app"><img alt="YZZO overview in a macOS screen" src="docs/assets/yzzo-overview.png" /></a>
   <h1><a href="https://yzzo.app">YZZO - Clipboard Manager</a></h1>
   <p>
     YZZO is a clipboard manager built for simplicity and productivity. Available for macOS and Linux.
