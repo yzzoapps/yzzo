@@ -1,4 +1,7 @@
-# YZZO - Clipboard Manager
+<div align="center">
+  <img alt="YZZO Logo" src="docs/assets/yzzo-overview.png" />
+  <h1><a href="https://yzzo.app">YZZO - Clipboard Manager</a></h1>
+</div>
 
 A modern clipboard manager built for simplicity and productivity. YZZO is completely free and open-source software.
 
