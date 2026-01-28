@@ -158,6 +158,93 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), Clipboa
                     }
                 }
             } else if let Ok(text) = text_result {
+                // check if it's a file URL pointing to an image
+                if text.starts_with("file://") {
+                    let file_path = text.trim_start_matches("file://");
+                    // URL decode the path (spaces are %20, etc.)
+                    let decoded_path = urlencoding::decode(file_path).unwrap_or_default();
+                    let path = std::path::Path::new(decoded_path.as_ref());
+
+                    // check if it's an image file
+                    if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                        let ext_lower = ext.to_lowercase();
+                        if matches!(
+                            ext_lower.as_str(),
+                            "png" | "jpg" | "jpeg" | "gif" | "bmp" | "webp" | "tiff" | "tif"
+                        ) {
+                            if path.exists() {
+                                // load the image and process it
+                                if let Ok(img) = image::open(path) {
+                                    let rgba = img.to_rgba8();
+                                    let (width, height) = rgba.dimensions();
+
+                                    // calculate hash for deduplication
+                                    let mut hasher = DefaultHasher::new();
+                                    rgba.as_raw().hash(&mut hasher);
+                                    width.hash(&mut hasher);
+                                    height.hash(&mut hasher);
+                                    let current_hash = hasher.finish();
+
+                                    let mut last_hash = last_image_hash_clone.lock().unwrap();
+
+                                    if *last_hash != current_hash {
+                                        *last_hash = current_hash;
+
+                                        let app_data_dir = match app_handle.path().app_data_dir() {
+                                            Ok(dir) => dir,
+                                            Err(e) => {
+                                                eprintln!(
+                                                    "[X] Failed to get app data directory: {}",
+                                                    e
+                                                );
+                                                continue;
+                                            }
+                                        };
+
+                                        let images_dir = app_data_dir.join("images");
+                                        if let Err(e) = std::fs::create_dir_all(&images_dir) {
+                                            eprintln!(
+                                                "[X] Failed to create images directory: {}",
+                                                e
+                                            );
+                                            continue;
+                                        }
+
+                                        let filename = format!("{}.png", current_hash);
+                                        let dest_path = images_dir.join(&filename);
+
+                                        if !dest_path.exists() {
+                                            let _ = rgba.save(&dest_path);
+                                        }
+
+                                        let metadata = serde_json::json!({
+                                            "width": width,
+                                            "height": height,
+                                            "format": "png",
+                                            "hash": current_hash.to_string(),
+                                            "size": std::fs::metadata(&dest_path).map(|m| m.len()).unwrap_or(0)
+                                        });
+
+                                        let _ = app_handle.emit(
+                                            "clipboard-changed",
+                                            serde_json::json!({
+                                                "type": "image",
+                                                "content": filename,
+                                                "file_path": dest_path.to_str().unwrap(),
+                                                "metadata": metadata.to_string()
+                                            }),
+                                        );
+
+                                        let mut last = last_text_clone.lock().unwrap();
+                                        *last = String::new();
+                                    }
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                }
+
                 // no image data, process text
                 // but skip HTML content that represents images
                 let is_html_image = text.trim().starts_with("<meta")
