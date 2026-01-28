@@ -5,7 +5,7 @@
       "signingIdentity": null,
       "entitlements": "./Entitlements.plist",
       "files": {
-        "embedded.provisionprofile": "./profiles/YZZO_Distribution_AppStore.provisionprofile"
+        "embedded.provisionprofile": "./path-to-profile/profile.provisionprofile"
       }
     }
   }

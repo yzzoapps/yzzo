@@ -7,6 +7,6 @@
     <key>com.apple.application-identifier</key>
     <string>$IDENTIFIER.app.yzzo.yzzo</string>
     <key>com.apple.developer.team-identifier</key>
-    <string>$IDENTIFIER.</string>
+    <string>$IDENTIFIER</string>
 </dict>
 </plist>
