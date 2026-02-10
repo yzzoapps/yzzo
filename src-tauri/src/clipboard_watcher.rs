@@ -16,13 +16,56 @@ fn is_flatpak() -> bool {
 /// Flatpak's Wayland portal filters out the wlr-data-control protocol
 /// needed for clipboard monitoring, so we fall back to X11 via XWayland.
 fn setup_flatpak_clipboard_env() {
-    if is_flatpak() {
-        // SAFETY: called once at startup before spawning clipboard thread
+    if !is_flatpak() {
+        return;
+    }
+
+    // If DISPLAY is already set, just force X11 backend
+    if std::env::var("DISPLAY").is_ok() {
         unsafe {
             std::env::set_var("GDK_BACKEND", "x11");
         }
         eprintln!("[i] Flatpak detected: using X11 clipboard backend via XWayland");
+        return;
     }
+
+    // DISPLAY not set (common on pure Wayland compositors like COSMIC).
+    // Detect XWayland display from /tmp/.X11-unix sockets.
+    let x11_dir = Path::new("/tmp/.X11-unix");
+    if let Ok(entries) = std::fs::read_dir(x11_dir) {
+        // Find the highest-numbered X socket owned by our user
+        let mut best: Option<u32> = None;
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if let Some(num_str) = name.strip_prefix('X') {
+                if let Ok(num) = num_str.parse::<u32>() {
+                    // Skip X0 (usually login greeter)
+                    if num > 0 {
+                        best = Some(num);
+                        break;
+                    } else if best.is_none() {
+                        best = Some(num);
+                    }
+                }
+            }
+        }
+        if let Some(display_num) = best {
+            let display = format!(":{}", display_num);
+            // SAFETY: called once at startup before spawning clipboard thread
+            unsafe {
+                std::env::set_var("DISPLAY", &display);
+                std::env::set_var("GDK_BACKEND", "x11");
+            }
+            eprintln!(
+                "[i] Flatpak detected: using X11 clipboard backend via XWayland (DISPLAY={})",
+                display
+            );
+            return;
+        }
+    }
+
+    eprintln!("[!] Flatpak detected but no X11 display found — clipboard may not work");
 }
 
 #[derive(Debug)]
