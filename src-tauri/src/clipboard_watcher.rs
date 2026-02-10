@@ -91,6 +91,12 @@ impl std::fmt::Display for ClipboardWatcherError {
     }
 }
 
+/// Expose Flatpak detection to the frontend so it can enable JS-based clipboard fallback.
+#[tauri::command]
+pub fn check_is_flatpak() -> bool {
+    is_flatpak()
+}
+
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), ClipboardWatcherError> {
     setup_flatpak_clipboard_env();
 

@@ -70,3 +70,12 @@ export async function clearAllItems(): Promise<void> {
     throw err;
   }
 }
+
+export async function checkIsFlatpak(): Promise<boolean> {
+  try {
+    return await invoke("check_is_flatpak");
+  } catch (err) {
+    console.error("Failed to check Flatpak status:", err);
+    return false;
+  }
+}
