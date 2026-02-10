@@ -38,9 +38,6 @@ private_keys/
 # Python venv
 .venv
 
-# npm lock (using bun)
-package-lock.json
-
 # Flatpak (lives in separate flathub repo)
 app.yzzo.yzzo.yml
 app.yzzo.yzzo.metainfo.xml
