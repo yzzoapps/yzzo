@@ -58,7 +58,23 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), Clipboa
     let last_image_hash_clone = last_image_hash.clone();
 
     thread::spawn(move || {
-        let mut clipboard = match Clipboard::new() {
+        // Inside Flatpak, Wayland clipboard goes through portals which block
+        // background access. Force X11 (via XWayland) by unsetting WAYLAND_DISPLAY.
+        // SAFETY: Brief env mutation at thread start before any env-dependent work.
+        let is_flatpak = std::path::Path::new("/.flatpak-info").exists();
+        let wayland_display = if is_flatpak {
+            let val = std::env::var("WAYLAND_DISPLAY").ok();
+            unsafe { std::env::remove_var("WAYLAND_DISPLAY") };
+            val
+        } else {
+            None
+        };
+        let clipboard_result = Clipboard::new();
+        if let Some(val) = wayland_display {
+            unsafe { std::env::set_var("WAYLAND_DISPLAY", val) };
+        }
+
+        let mut clipboard = match clipboard_result {
             Ok(c) => c,
             Err(e) => {
                 eprintln!("[X] Failed to initialize clipboard: {}", e);

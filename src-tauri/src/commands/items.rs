@@ -195,8 +195,23 @@ pub async fn write_image_to_clipboard(file_path: String) -> Result<(), String> {
         bytes: rgba.into_raw().into(),
     };
 
+    // Inside Flatpak, force X11 clipboard to bypass portal restrictions.
+    // SAFETY: Brief env mutation; acceptable for clipboard init.
+    let is_flatpak = std::path::Path::new("/.flatpak-info").exists();
+    let wayland_display = if is_flatpak {
+        let val = std::env::var("WAYLAND_DISPLAY").ok();
+        unsafe { std::env::remove_var("WAYLAND_DISPLAY") };
+        val
+    } else {
+        None
+    };
+    let clipboard_result = Clipboard::new();
+    if let Some(val) = &wayland_display {
+        unsafe { std::env::set_var("WAYLAND_DISPLAY", val) };
+    }
+
     let mut clipboard =
-        Clipboard::new().map_err(|e| format!("Failed to access clipboard: {}", e))?;
+        clipboard_result.map_err(|e| format!("Failed to access clipboard: {}", e))?;
 
     clipboard
         .set_image(img_data)
