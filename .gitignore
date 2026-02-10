@@ -38,10 +38,8 @@ private_keys/
 # Python venv
 .venv
 
-# Flatpak (lives in separate flathub repo)
+# Flatpak build files (lives in separate flathub repo)
 app.yzzo.yzzo.yml
-app.yzzo.yzzo.metainfo.xml
-app.yzzo.yzzo.desktop
 flathub.json
 cargo-sources.json
 node-sources.json
