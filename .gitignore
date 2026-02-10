@@ -38,6 +38,11 @@ private_keys/
 # Python venv
 .venv
 
+# Flatpak build artifacts
+build-dir/
+builddir/
+.flatpak-builder/
+
 # Flatpak build files (lives in separate flathub repo)
 app.yzzo.yzzo.yml
 flathub.json
