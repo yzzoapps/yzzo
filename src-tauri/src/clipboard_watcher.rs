@@ -85,6 +85,16 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), Clipboa
         thread::sleep(Duration::from_millis(500));
 
         loop {
+            // Recreate clipboard each iteration to ensure fresh Wayland data-control state
+            clipboard = match Clipboard::new() {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("[X] Failed to reinitialize clipboard: {}", e);
+                    thread::sleep(Duration::from_millis(1000));
+                    continue;
+                }
+            };
+
             // try to get image first to avoid reading clipboard multiple times
             let image_result = clipboard.get_image();
             let text_result = clipboard.get_text();
