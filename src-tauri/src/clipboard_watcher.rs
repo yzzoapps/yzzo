@@ -1,10 +1,29 @@
 use arboard::Clipboard;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, Wry};
+
+/// Check if we're running inside a Flatpak sandbox
+fn is_flatpak() -> bool {
+    Path::new("/.flatpak-info").exists()
+}
+
+/// Force X11 clipboard backend when running inside Flatpak.
+/// Flatpak's Wayland portal filters out the wlr-data-control protocol
+/// needed for clipboard monitoring, so we fall back to X11 via XWayland.
+fn setup_flatpak_clipboard_env() {
+    if is_flatpak() {
+        // SAFETY: called once at startup before spawning clipboard thread
+        unsafe {
+            std::env::set_var("GDK_BACKEND", "x11");
+        }
+        eprintln!("[i] Flatpak detected: using X11 clipboard backend via XWayland");
+    }
+}
 
 #[derive(Debug)]
 pub enum ClipboardWatcherError {
@@ -30,6 +49,8 @@ impl std::fmt::Display for ClipboardWatcherError {
 }
 
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), ClipboardWatcherError> {
+    setup_flatpak_clipboard_env();
+
     // Validate we can get the app data directory before starting the thread
     let app_data_dir = app_handle
         .path()
@@ -85,16 +106,6 @@ pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), Clipboa
         thread::sleep(Duration::from_millis(500));
 
         loop {
-            // Recreate clipboard each iteration to ensure fresh Wayland data-control state
-            clipboard = match Clipboard::new() {
-                Ok(c) => c,
-                Err(e) => {
-                    eprintln!("[X] Failed to reinitialize clipboard: {}", e);
-                    thread::sleep(Duration::from_millis(1000));
-                    continue;
-                }
-            };
-
             // try to get image first to avoid reading clipboard multiple times
             let image_result = clipboard.get_image();
             let text_result = clipboard.get_text();

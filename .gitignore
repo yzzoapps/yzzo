@@ -42,6 +42,7 @@ private_keys/
 build-dir/
 builddir/
 .flatpak-builder/
+repo/
 
 # Flatpak build files (lives in separate flathub repo)
 app.yzzo.yzzo.yml
