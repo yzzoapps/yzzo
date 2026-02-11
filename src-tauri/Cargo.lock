@@ -6825,6 +6825,7 @@ dependencies = [
  "arboard",
  "base64 0.22.1",
  "futures",
+ "gtk",
  "image",
  "serde",
  "serde_json",

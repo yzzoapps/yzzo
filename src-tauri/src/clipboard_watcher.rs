@@ -7,65 +7,12 @@ use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, Wry};
 
+use gtk::gdk;
+use gtk::glib;
+
 /// Check if we're running inside a Flatpak sandbox
 fn is_flatpak() -> bool {
     Path::new("/.flatpak-info").exists()
-}
-
-/// Force X11 clipboard backend when running inside Flatpak.
-/// Flatpak's Wayland portal filters out the wlr-data-control protocol
-/// needed for clipboard monitoring, so we fall back to X11 via XWayland.
-fn setup_flatpak_clipboard_env() {
-    if !is_flatpak() {
-        return;
-    }
-
-    // If DISPLAY is already set, just force X11 backend
-    if std::env::var("DISPLAY").is_ok() {
-        unsafe {
-            std::env::set_var("GDK_BACKEND", "x11");
-        }
-        eprintln!("[i] Flatpak detected: using X11 clipboard backend via XWayland");
-        return;
-    }
-
-    // DISPLAY not set (common on pure Wayland compositors like COSMIC).
-    // Detect XWayland display from /tmp/.X11-unix sockets.
-    let x11_dir = Path::new("/tmp/.X11-unix");
-    if let Ok(entries) = std::fs::read_dir(x11_dir) {
-        // Find the highest-numbered X socket owned by our user
-        let mut best: Option<u32> = None;
-        for entry in entries.flatten() {
-            let name = entry.file_name();
-            let name = name.to_string_lossy();
-            if let Some(num_str) = name.strip_prefix('X') {
-                if let Ok(num) = num_str.parse::<u32>() {
-                    // Skip X0 (usually login greeter)
-                    if num > 0 {
-                        best = Some(num);
-                        break;
-                    } else if best.is_none() {
-                        best = Some(num);
-                    }
-                }
-            }
-        }
-        if let Some(display_num) = best {
-            let display = format!(":{}", display_num);
-            // SAFETY: called once at startup before spawning clipboard thread
-            unsafe {
-                std::env::set_var("DISPLAY", &display);
-                std::env::set_var("GDK_BACKEND", "x11");
-            }
-            eprintln!(
-                "[i] Flatpak detected: using X11 clipboard backend via XWayland (DISPLAY={})",
-                display
-            );
-            return;
-        }
-    }
-
-    eprintln!("[!] Flatpak detected but no X11 display found — clipboard may not work");
 }
 
 #[derive(Debug)]
@@ -97,8 +44,44 @@ pub fn check_is_flatpak() -> bool {
     is_flatpak()
 }
 
+/// Start clipboard watcher using GTK's clipboard API.
+/// GTK clipboard goes through GDK → Wayland portal, which works in Flatpak.
+fn start_gtk_clipboard_watcher(app_handle: AppHandle<Wry>) {
+    let last_text: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
+
+    // Use glib timeout to poll GTK clipboard on the main loop
+    let interval_ms = 500;
+    glib::timeout_add_local(Duration::from_millis(interval_ms), move || {
+        let gtk_clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
+
+        if let Some(text) = gtk_clipboard.wait_for_text() {
+            let text = text.to_string();
+            if !text.is_empty() {
+                let mut last = last_text.lock().unwrap();
+                if *last != text {
+                    *last = text.clone();
+                    let _ = app_handle.emit(
+                        "clipboard-changed",
+                        serde_json::json!({
+                            "type": "text",
+                            "content": text
+                        }),
+                    );
+                }
+            }
+        }
+
+        glib::ControlFlow::Continue
+    });
+
+    eprintln!("[i] Flatpak detected: using GTK clipboard watcher (portal-compatible)");
+}
+
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), ClipboardWatcherError> {
-    setup_flatpak_clipboard_env();
+    if is_flatpak() {
+        start_gtk_clipboard_watcher(app_handle);
+        return Ok(());
+    }
 
     // Validate we can get the app data directory before starting the thread
     let app_data_dir = app_handle
