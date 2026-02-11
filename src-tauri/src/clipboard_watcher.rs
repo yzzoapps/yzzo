@@ -7,10 +7,13 @@ use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, Wry};
 
+#[cfg(target_os = "linux")]
 use gtk::gdk;
+#[cfg(target_os = "linux")]
 use gtk::glib;
 
 /// Check if we're running inside a Flatpak sandbox
+#[cfg(target_os = "linux")]
 fn is_flatpak() -> bool {
     Path::new("/.flatpak-info").exists()
 }
@@ -40,6 +43,7 @@ impl std::fmt::Display for ClipboardWatcherError {
 
 /// Start clipboard watcher using GTK's clipboard API.
 /// GTK clipboard goes through GDK → Wayland portal, which works in Flatpak.
+#[cfg(target_os = "linux")]
 fn start_gtk_clipboard_watcher(app_handle: AppHandle<Wry>) {
     let last_text: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
     let last_image_hash: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
@@ -146,6 +150,7 @@ fn start_gtk_clipboard_watcher(app_handle: AppHandle<Wry>) {
 }
 
 pub fn start_clipboard_watcher(app_handle: AppHandle<Wry>) -> Result<(), ClipboardWatcherError> {
+    #[cfg(target_os = "linux")]
     if is_flatpak() {
         start_gtk_clipboard_watcher(app_handle);
         return Ok(());
