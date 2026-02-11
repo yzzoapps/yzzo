@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Lucca Romaniello -->
+<component type="desktop-application">
+  <id>app.yzzo.yzzo</id>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>YZZO - Clipboard Manager</name>
+  <summary>A clipboard manager built for simplicity and productivity.</summary>
+
+  <developer id="app.yzzo">
+    <name>Lucca Romaniello</name>
+  </developer>
+
+  <description>
+    <p>
+      YZZO is a clipboard manager built for simplicity and productivity.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Simple: Automatically saves text and images you copy. Easily find and paste anything from your history.</li>
+      <li>Customizable: Set up global hotkeys for instant access. Choose between light and dark themes.</li>
+      <li>Private: No analytics, no telemetry, no tracking. Your clipboard history is stored locally on your device.</li>
+      <li>YZZO is open-source. This Flathub version supports ongoing development.</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">app.yzzo.yzzo.desktop</launchable>
+
+  <url type="homepage">https://yzzo.app</url>
+  <url type="bugtracker">https://github.com/yzzoapps/yzzo/issues</url>
+  <url type="vcs-browser">https://github.com/yzzoapps/yzzo</url>
+  <url type="donation">https://github.com/sponsors/luccaromaniello</url>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#ffffff</color>
+    <color type="primary" scheme_preference="dark">#1a1a2e</color>
+  </branding>
+
+  <content_rating type="oars-1.1" />
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <categories>
+    <category>Utility</category>
+  </categories>
+
+  <keywords>
+    <keyword>clipboard</keyword>
+    <keyword>manager</keyword>
+    <keyword>copy</keyword>
+    <keyword>paste</keyword>
+    <keyword>productivity</keyword>
+    <keyword>offline</keyword>
+  </keywords>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>YZZO overview showing clipboard history</caption>
+      <image>https://github.com/yzzoapps/yzzo/blob/3e3cc372e9046ef86147f134d5c659c174ea2767/docs/assets/yzzo-overview.png</image>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="1.0.6" date="2026-02-09">
+      <description>
+        <p>First Flathub release.</p>
+      </description>
+    </release>
+  </releases>
+
+</component>

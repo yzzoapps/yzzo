@@ -34,3 +34,19 @@ src-tauri/profiles/*.provisionprofile
 # Apple API Keys
 private_keys/
 *.p8
+
+# Python venv
+.venv
+
+# Flatpak build artifacts
+build-dir/
+builddir/
+.flatpak-builder/
+repo/
+
+# Flatpak build files (lives in separate flathub repo)
+app.yzzo.yzzo.yml
+flathub.json
+cargo-sources.json
+node-sources.json
+flatpak-cargo-generator.py

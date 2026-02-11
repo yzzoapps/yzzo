@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=YZZO
+Comment=A clipboard manager built for simplicity and productivity
+Exec=yzzo
+Icon=app.yzzo.yzzo
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupWMClass=yzzo
