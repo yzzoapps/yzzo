@@ -64,8 +64,7 @@ pub fn run() {
             hotkeys::set_hotkey,
             hotkeys::get_hotkey,
             hotkeys::get_hold_behavior,
-            hotkeys::set_hold_behavior,
-            clipboard_watcher::check_is_flatpak
+            hotkeys::set_hold_behavior
         ])
         .setup(move |app| {
             #[cfg(desktop)]

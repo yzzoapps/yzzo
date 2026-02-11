@@ -195,7 +195,6 @@ pub async fn write_image_to_clipboard(file_path: String) -> Result<(), String> {
         bytes: rgba.into_raw().into(),
     };
 
-    // Flatpak clipboard env is already set by clipboard_watcher::setup_flatpak_clipboard_env
     let mut clipboard =
         Clipboard::new().map_err(|e| format!("Failed to access clipboard: {}", e))?;
 
