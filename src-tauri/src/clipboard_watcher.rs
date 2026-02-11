@@ -48,18 +48,92 @@ pub fn check_is_flatpak() -> bool {
 /// GTK clipboard goes through GDK → Wayland portal, which works in Flatpak.
 fn start_gtk_clipboard_watcher(app_handle: AppHandle<Wry>) {
     let last_text: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
+    let last_image_hash: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
 
     // Use glib timeout to poll GTK clipboard on the main loop
     let interval_ms = 500;
     glib::timeout_add_local(Duration::from_millis(interval_ms), move || {
         let gtk_clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
 
-        if let Some(text) = gtk_clipboard.wait_for_text() {
+        // Check for image first (same priority as the arboard watcher)
+        if let Some(pixbuf) = gtk_clipboard.wait_for_image() {
+            let width = pixbuf.width() as u32;
+            let height = pixbuf.height() as u32;
+            let has_alpha = pixbuf.has_alpha();
+            let rowstride = pixbuf.rowstride() as usize;
+            let n_channels = pixbuf.n_channels() as usize;
+
+            // Convert pixbuf to RGBA bytes
+            let pixels = unsafe { pixbuf.pixels() };
+            let mut rgba = Vec::with_capacity((width * height * 4) as usize);
+            for y in 0..height as usize {
+                for x in 0..width as usize {
+                    let offset = y * rowstride + x * n_channels;
+                    let r = pixels[offset];
+                    let g = pixels[offset + 1];
+                    let b = pixels[offset + 2];
+                    let a = if has_alpha { pixels[offset + 3] } else { 255 };
+                    rgba.extend_from_slice(&[r, g, b, a]);
+                }
+            }
+
+            // Hash for deduplication
+            let mut hasher = DefaultHasher::new();
+            rgba.hash(&mut hasher);
+            width.hash(&mut hasher);
+            height.hash(&mut hasher);
+            let current_hash = hasher.finish();
+
+            let mut last_hash = last_image_hash.lock().unwrap();
+            if *last_hash != current_hash {
+                *last_hash = current_hash;
+
+                if let Ok(app_data_dir) = app_handle.path().app_data_dir() {
+                    let images_dir = app_data_dir.join("images");
+                    let _ = std::fs::create_dir_all(&images_dir);
+
+                    let filename = format!("{}.png", current_hash);
+                    let file_path = images_dir.join(&filename);
+
+                    if !file_path.exists() {
+                        if let Some(img) = image::RgbaImage::from_raw(width, height, rgba) {
+                            let _ = img.save(&file_path);
+                        }
+                    }
+
+                    let metadata = serde_json::json!({
+                        "width": width,
+                        "height": height,
+                        "format": "png",
+                        "hash": current_hash.to_string(),
+                        "size": std::fs::metadata(&file_path).map(|m| m.len()).unwrap_or(0)
+                    });
+
+                    let _ = app_handle.emit(
+                        "clipboard-changed",
+                        serde_json::json!({
+                            "type": "image",
+                            "content": filename,
+                            "file_path": file_path.to_str().unwrap(),
+                            "metadata": metadata.to_string()
+                        }),
+                    );
+
+                    // Clear last text so we don't emit duplicate
+                    let mut last = last_text.lock().unwrap();
+                    *last = String::new();
+                }
+            }
+        } else if let Some(text) = gtk_clipboard.wait_for_text() {
             let text = text.to_string();
             if !text.is_empty() {
                 let mut last = last_text.lock().unwrap();
                 if *last != text {
                     *last = text.clone();
+                    // Clear image hash when text changes
+                    let mut last_hash = last_image_hash.lock().unwrap();
+                    *last_hash = 0;
+
                     let _ = app_handle.emit(
                         "clipboard-changed",
                         serde_json::json!({
